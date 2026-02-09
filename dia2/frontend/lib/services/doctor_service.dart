@@ -173,7 +173,7 @@ class DoctorService {
       },
       body: jsonEncode({
         'appointment': appointmentId,
-        'feedback_text': feedback,
+        'comment': feedback,
         'rating': rating.toInt(),
       }),
     );
@@ -207,6 +207,11 @@ class DoctorService {
     final responseData = jsonDecode(response.body);
     if (response.statusCode == 200) {
       if (responseData is List) return responseData;
+      
+      // Look for the actual list inside various possible keys
+      final data = responseData['data'];
+      if (data is Map && data['feedbacks'] != null) return data['feedbacks'];
+      
       return responseData['results'] ?? 
              responseData['data'] ?? 
              responseData['feedback'] ?? 
