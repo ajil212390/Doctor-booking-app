@@ -192,20 +192,16 @@ class HomeDashboardState extends State<HomeDashboard> {
               TextButton(
                 onPressed: () async {
                   final text = reviewController.text.trim();
-                  if (text.isEmpty) {
-                    AppToast.show(context, 'Please enter your feedback');
-                    return;
-                  }
                   
                   try {
                     await DoctorService().submitFeedback(
                       appointmentId: appointment['id'],
-                      feedback: reviewController.text.trim(),
+                      feedback: text.isEmpty ? "Great consultation!" : text, // Default text if empty
                       rating: currentRating,
                     );
                     if (mounted) {
                       Navigator.pop(context);
-                      AppToast.show(context, 'Thank you for your feedback!', isError: false);
+                      AppToast.show(context, 'Success! Feedback shared.', isError: false);
                     }
                   } catch (e) {
                     if (mounted) {

@@ -44,16 +44,17 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
         final fText = apt['feedback_text'] ?? apt['feedback'] ?? (apt['review'] is Map ? apt['review']['text'] : null);
         final ratingVal = apt['rating'] ?? (apt['review'] is Map ? apt['review']['rating'] : null);
         
-        if (fText != null && fText.toString().trim().isNotEmpty) {
+        // If we found either text OR a rating, it's feedback
+        if ((fText != null && fText.toString().trim().isNotEmpty) || ratingVal != null) {
           bool exists = aggregatedFeedback.any((f) => f['id'] == apt['id'] || 
                                                      (f['appointment_id'] == apt['id']) ||
-                                                     (f['feedback_text'] == fText));
+                                                     (fText != null && f['feedback_text'] == fText));
           if (!exists) {
             aggregatedFeedback.add({
               'id': apt['id'],
               'patient_name': apt['patient_name'] ?? apt['patient_full_name'] ?? (apt['patient'] is Map ? apt['patient']['full_name'] : 'Patient'),
-              'feedback_text': fText,
-              'rating': ratingVal,
+              'feedback_text': fText ?? 'Rating only',
+              'rating': ratingVal ?? 5.0,
               'created_at': apt['updated_at'] ?? apt['date'] ?? apt['created_at'],
             });
           }
