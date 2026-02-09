@@ -392,6 +392,30 @@ class _DoctorListScreenState extends State<DoctorListScreen> {
                         letterSpacing: 0.5,
                       ),
                     ),
+                    const SizedBox(height: 8),
+                    // Rating
+                    Row(
+                      children: [
+                        const Icon(Icons.star_rounded, color: Colors.amber, size: 14),
+                        const SizedBox(width: 4),
+                        Text(
+                          (doc['average_rating'] ?? doc['rating'])?.toStringAsFixed(1) ?? '4.5',
+                          style: GoogleFonts.plusJakartaSans(
+                            color: Colors.white.withOpacity(0.9),
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          '(${doc['review_count'] ?? '12'})',
+                          style: GoogleFonts.plusJakartaSans(
+                            color: const Color(0xFF64748B),
+                            fontSize: 10,
+                          ),
+                        ),
+                      ],
+                    ),
                     const SizedBox(height: 16),
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),

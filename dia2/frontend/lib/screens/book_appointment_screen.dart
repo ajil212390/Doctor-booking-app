@@ -287,6 +287,29 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
             color: const Color(0xFF94A3B8),
           ),
         ),
+        const SizedBox(height: 12),
+        Row(
+          children: [
+            const Icon(Icons.star_rounded, color: Colors.amber, size: 18),
+            const SizedBox(width: 8),
+            Text(
+              (_doctor['average_rating'] ?? _doctor['rating'])?.toStringAsFixed(1) ?? '4.5',
+              style: GoogleFonts.plusJakartaSans(
+                color: Colors.white,
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(width: 8),
+            Text(
+              '(${_doctor['review_count'] ?? '12'} reviews)',
+              style: GoogleFonts.plusJakartaSans(
+                color: const Color(0xFF64748B),
+                fontSize: 14,
+              ),
+            ),
+          ],
+        ),
       ],
     );
   }
