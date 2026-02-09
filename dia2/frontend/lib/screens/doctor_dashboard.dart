@@ -25,7 +25,7 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
   void initState() {
     super.initState();
     _loadAllData();
-  }
+  }  
 
   Future<void> _loadAllData() async {
     await _loadDoctorName();
