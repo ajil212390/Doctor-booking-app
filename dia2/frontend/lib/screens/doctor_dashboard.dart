@@ -23,23 +23,68 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
   @override
   void initState() {
     super.initState();
-    _loadDoctorName();
-    _fetchAppointments();
-    _fetchFeedback();
+    _loadAllData();
+  }
+
+  Future<void> _loadAllData() async {
+    await _loadDoctorName();
+    await _fetchAppointments();
+    await _fetchFeedback();
   }
 
   Future<void> _fetchFeedback() async {
     try {
-      final feedback = await DoctorService().getDoctorFeedback();
+      final feedbackList = await DoctorService().getDoctorFeedback();
+      
+      // Also try to extract feedback from appointments as a fallback
+      final List<dynamic> aggregatedFeedback = List.from(feedbackList);
+      
+      for (var apt in _appointments) {
+        // Try multiple keys for feedback text
+        final fText = apt['feedback_text'] ?? apt['feedback'] ?? (apt['review'] is Map ? apt['review']['text'] : null);
+        final ratingVal = apt['rating'] ?? (apt['review'] is Map ? apt['review']['rating'] : null);
+        
+        if (fText != null && fText.toString().trim().isNotEmpty) {
+          bool exists = aggregatedFeedback.any((f) => f['id'] == apt['id'] || 
+                                                     (f['appointment_id'] == apt['id']) ||
+                                                     (f['feedback_text'] == fText));
+          if (!exists) {
+            aggregatedFeedback.add({
+              'id': apt['id'],
+              'patient_name': apt['patient_name'] ?? apt['patient_full_name'] ?? (apt['patient'] is Map ? apt['patient']['full_name'] : 'Patient'),
+              'feedback_text': fText,
+              'rating': ratingVal,
+              'created_at': apt['updated_at'] ?? apt['date'] ?? apt['created_at'],
+            });
+          }
+        }
+      }
+
       if (mounted) {
+        // Sort by date DESC
+        aggregatedFeedback.sort((a, b) {
+          final dateA = DateTime.tryParse(a['created_at']?.toString() ?? '') ?? DateTime(1970);
+          final dateB = DateTime.tryParse(b['created_at']?.toString() ?? '') ?? DateTime(1970);
+          return dateB.compareTo(dateA);
+        });
+        
         setState(() {
-          _feedback = feedback;
+          _feedback = aggregatedFeedback;
           _isLoadingFeedback = false;
         });
       }
     } catch (e) {
       if (mounted) setState(() => _isLoadingFeedback = false);
     }
+  }
+
+  Future<void> _handleRefresh() async {
+    setState(() {
+      _isLoading = true;
+      _isLoadingFeedback = true;
+    });
+    await _fetchAppointments();
+    await _fetchFeedback();
   }
 
   Future<void> _fetchAppointments() async {
@@ -81,21 +126,27 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
         ),
         child: SafeArea(
           bottom: false,
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: 24),
-                _buildHeader(),
-                const SizedBox(height: 32),
-                _buildDailyForecastCard(),
-                const SizedBox(height: 24),
-                _buildQuickActions(context),
-                const SizedBox(height: 32),
-                _buildFeedbackSection(),
-                const SizedBox(height: 120), // Bottom nav space
-              ],
+          child: RefreshIndicator(
+            onRefresh: _handleRefresh,
+            color: Colors.white,
+            backgroundColor: const Color(0xFF1A1A1A),
+            child: SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 24),
+                  _buildHeader(),
+                  const SizedBox(height: 32),
+                  _buildDailyForecastCard(),
+                  const SizedBox(height: 24),
+                  _buildQuickActions(context),
+                  const SizedBox(height: 32),
+                  _buildFeedbackSection(),
+                  const SizedBox(height: 120), // Bottom nav space
+                ],
+              ),
             ),
           ),
         ),
@@ -496,11 +547,23 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
                   patientName,
                   style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold),
                 ),
-                Text(
-                  dateStr,
-                  style: const TextStyle(color: AppColors.silver500, fontSize: 10),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: List.generate(5, (index) {
+                    final rating = (f['rating'] as num?)?.toDouble() ?? 5.0;
+                    return Icon(
+                      index < rating ? Icons.star : Icons.star_border,
+                      color: index < rating ? Colors.amber : Colors.white10,
+                      size: 10,
+                    );
+                  }),
                 ),
               ],
+            ),
+            const SizedBox(height: 2),
+            Text(
+              dateStr,
+              style: const TextStyle(color: AppColors.silver500, fontSize: 9),
             ),
             const SizedBox(height: 8),
             Text(

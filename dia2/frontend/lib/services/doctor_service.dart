@@ -158,12 +158,13 @@ class DoctorService {
   }
 
   /// Submit feedback for an appointment (Patient only)
-  Future<void> submitFeedback({required int appointmentId, required String feedback}) async {
+  Future<void> submitFeedback({required int appointmentId, required String feedback, double rating = 5.0}) async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('access_token');
 
-    final response = await http.patch(
-      Uri.parse('${_baseUrl}${ApiConfig.userAppointmentDetail(appointmentId)}'),
+    // Using POST to userFeedback endpoint instead of PATCH to appointment
+    final response = await http.post(
+      Uri.parse('${_baseUrl}${ApiConfig.userFeedback}'),
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $token',
@@ -171,17 +172,26 @@ class DoctorService {
         'X-Tunnel-Skip-Anti-Phishing-Page': '1',
       },
       body: jsonEncode({
+        'appointment': appointmentId,
         'feedback_text': feedback,
-        'review_submitted': true,
+        'rating': rating.toInt(),
       }),
     );
 
-    if (response.body.isEmpty) throw 'Empty response from server';
-    if (response.statusCode != 200 && response.statusCode != 204) {
-      final responseData = jsonDecode(response.body);
-      final errorMsg = responseData['message'] ?? responseData['detail'] ?? responseData.toString();
-      throw Exception('Status ${response.statusCode}: $errorMsg');
+    if (response.statusCode >= 200 && response.statusCode < 300) {
+      return;
     }
+
+    String errorMsg = 'Failed to submit feedback';
+    try {
+      if (response.body.isNotEmpty) {
+        final Map<String, dynamic> responseData = jsonDecode(response.body);
+        errorMsg = responseData['message'] ?? responseData['detail'] ?? responseData.toString();
+      }
+    } catch (e) {
+      errorMsg = 'Server error: ${response.statusCode}';
+    }
+    throw Exception(errorMsg);
   }
 
   /// Fetch feedback for the logged-in doctor
@@ -196,7 +206,12 @@ class DoctorService {
 
     final responseData = jsonDecode(response.body);
     if (response.statusCode == 200) {
-      return responseData is List ? responseData : (responseData['results'] ?? responseData['data'] ?? []);
+      if (responseData is List) return responseData;
+      return responseData['results'] ?? 
+             responseData['data'] ?? 
+             responseData['feedback'] ?? 
+             responseData['reviews'] ?? 
+             responseData['feedback_entries'] ?? [];
     } else {
       throw Exception(responseData['message'] ?? 'Failed to fetch feedback');
     }

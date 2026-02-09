@@ -29,21 +29,13 @@ class HomeDashboardState extends State<HomeDashboard> {
   String _role = 'DOCTOR';
   String _name = 'Doctor';
   Map<String, dynamic>? _latestPrediction;
-  List<dynamic> _doctors = [];
   List<dynamic> _appointments = [];
   bool _isHistoryLoading = true;
-  bool _isDoctorsLoading = true;
   bool _isAppointmentsLoading = true;
   
-  // Carousel logic
-  late PageController _doctorPageController;
-  int _currentDoctorPage = 0;
-  Timer? _doctorTimer;
-
   @override
   void initState() {
     super.initState();
-    _doctorPageController = PageController(viewportFraction: 0.9);
     _initialize();
   }
 
@@ -61,13 +53,11 @@ class HomeDashboardState extends State<HomeDashboard> {
         });
       }
       // If we have manual data, we skip loading list to avoid race conditions with server
-      _fetchDoctors();
       _fetchAppointments();
       _checkPendingReviews();
       return;
     }
     _loadLatestPrediction();
-    _fetchDoctors();
     _fetchAppointments();
     _checkPendingReviews();
   }
@@ -97,10 +87,32 @@ class HomeDashboardState extends State<HomeDashboard> {
     
     try {
       final appointments = await DoctorService().getUserAppointments();
-      // Find a completed appointment that hasn't been reviewed
-      // Assuming the backend has a 'is_reviewed' flag or we can just try/check
+      final now = DateTime.now();
+      
       final pendingReview = appointments.firstWhere(
-        (apt) => apt['status'] == 'COMPLETED' && apt['review_submitted'] != true,
+        (apt) {
+          if (apt['review_submitted'] == true) return false;
+          
+          final status = apt['status']?.toString().toUpperCase() ?? 'PENDING';
+          final isCompleted = status == 'COMPLETED';
+          
+          // Time expiry logic
+          bool isExpired = false;
+          try {
+            final slot = apt['slot_details'] ?? {};
+            final dateStr = (apt['date'] ?? slot['date'])?.toString() ?? '';
+            final timeStr = (apt['end_time'] ?? slot['end_time'] ?? '23:59')?.toString() ?? '23:59';
+            
+            if (dateStr.isNotEmpty) {
+              final cleanDate = dateStr.contains('T') ? dateStr.split('T')[0] : dateStr.split(' ')[0];
+              final appointmentEnd = DateTime.parse('${cleanDate} $timeStr');
+              isExpired = now.isAfter(appointmentEnd);
+            }
+          } catch (_) {}
+
+          // Rule: Show if COMPLETED OR (Time is over AND NOT CANCELLED)
+          return isCompleted || (isExpired && status != 'CANCELLED');
+        },
         orElse: () => null,
       );
 
@@ -115,135 +127,104 @@ class HomeDashboardState extends State<HomeDashboard> {
   void _showReviewDialog(dynamic appointment) {
     final TextEditingController reviewController = TextEditingController();
     final doctorName = appointment['doctor_name'] ?? 'your doctor';
+    double currentRating = 5.0;
 
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-        child: AlertDialog(
-          backgroundColor: const Color(0xFF111111),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(24),
-            side: BorderSide(color: Colors.white.withOpacity(0.1)),
-          ),
-          title: Text(
-            'How was your consultation?',
-            style: GoogleFonts.plusJakartaSans(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-              fontSize: 18,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setDialogState) => BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          child: AlertDialog(
+            backgroundColor: const Color(0xFF111111),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(24),
+              side: BorderSide(color: Colors.white.withOpacity(0.1)),
             ),
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Share your experience with $doctorName.',
-                style: GoogleFonts.plusJakartaSans(color: AppColors.silver400, fontSize: 13),
+            title: Text(
+              'How was your consultation?',
+              style: GoogleFonts.plusJakartaSans(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 18,
               ),
-              const SizedBox(height: 20),
-              TextField(
-                controller: reviewController,
-                maxLines: 3,
-                style: const TextStyle(color: Colors.white, fontSize: 14),
-                decoration: InputDecoration(
-                  hintText: 'Enter your feedback here...',
-                  hintStyle: TextStyle(color: Colors.white.withOpacity(0.2)),
-                  filled: true,
-                  fillColor: Colors.white.withOpacity(0.05),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide: BorderSide(color: Colors.white.withOpacity(0.1)),
+            ),
+            content: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Share your experience with $doctorName.',
+                    style: GoogleFonts.plusJakartaSans(color: AppColors.silver400, fontSize: 13),
                   ),
-                ),
+                  const SizedBox(height: 24),
+                  Center(
+                    child: StarRating(
+                      rating: currentRating,
+                      onRatingChanged: (rating) => setDialogState(() => currentRating = rating),
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  TextField(
+                    controller: reviewController,
+                    maxLines: 3,
+                    style: const TextStyle(color: Colors.white, fontSize: 14),
+                    decoration: InputDecoration(
+                      hintText: 'Enter your feedback here...',
+                      hintStyle: TextStyle(color: Colors.white.withOpacity(0.2)),
+                      filled: true,
+                      fillColor: Colors.white.withOpacity(0.05),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16),
+                        borderSide: BorderSide(color: Colors.white.withOpacity(0.1)),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('LATER', style: TextStyle(color: AppColors.silver500)),
+              ),
+              TextButton(
+                onPressed: () async {
+                  final text = reviewController.text.trim();
+                  if (text.isEmpty) {
+                    AppToast.show(context, 'Please enter your feedback');
+                    return;
+                  }
+                  
+                  try {
+                    await DoctorService().submitFeedback(
+                      appointmentId: appointment['id'],
+                      feedback: reviewController.text.trim(),
+                      rating: currentRating,
+                    );
+                    if (mounted) {
+                      Navigator.pop(context);
+                      AppToast.show(context, 'Thank you for your feedback!', isError: false);
+                    }
+                  } catch (e) {
+                    if (mounted) {
+                      AppToast.show(context, 'Error: $e');
+                    }
+                  }
+                },
+                child: const Text('SUBMIT', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
               ),
             ],
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('LATER', style: TextStyle(color: AppColors.silver500)),
-            ),
-            TextButton(
-              onPressed: () async {
-                if (reviewController.text.trim().isEmpty) return;
-                
-                try {
-                  await DoctorService().submitFeedback(
-                    appointmentId: appointment['id'],
-                    feedback: reviewController.text.trim(),
-                  );
-                  if (mounted) {
-                    Navigator.pop(context);
-                    AppToast.show(context, 'Thank you for your feedback!', isError: false);
-                  }
-                } catch (e) {
-                  if (mounted) {
-                    AppToast.show(context, 'Error: $e');
-                  }
-                }
-              },
-              child: const Text('SUBMIT', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-            ),
-          ],
         ),
       ),
     );
   }
 
-  void _fetchDoctors() async {
-    try {
-      final doctors = await DoctorService().getApprovedDoctors();
-      if (mounted) {
-        // Prioritize doctors already consulted (in _appointments)
-        final consultedDoctorNames = _appointments
-            .map((apt) => apt['doctor_name']?.toString() ?? '')
-            .toSet();
-
-        List<dynamic> sortedDoctors = List.from(doctors);
-        sortedDoctors.sort((a, b) {
-          final aConsulted = consultedDoctorNames.contains(a['full_name']);
-          final bConsulted = consultedDoctorNames.contains(b['full_name']);
-          if (aConsulted && !bConsulted) return -1;
-          if (!aConsulted && bConsulted) return 1;
-          return 0;
-        });
-
-        setState(() {
-          _doctors = sortedDoctors.take(5).toList();
-          _isDoctorsLoading = false;
-        });
-        
-        _startDoctorTimer();
-      }
-    } catch (e) {
-      if (mounted) setState(() => _isDoctorsLoading = false);
-    }
-  }
-
-  void _startDoctorTimer() {
-    _doctorTimer?.cancel();
-    if (_doctors.isEmpty) return;
-    
-    _doctorTimer = Timer.periodic(const Duration(seconds: 4), (timer) {
-      if (_doctors.isEmpty) return;
-      _currentDoctorPage = (_currentDoctorPage + 1) % _doctors.length;
-      if (_doctorPageController.hasClients) {
-        _doctorPageController.animateToPage(
-          _currentDoctorPage,
-          duration: const Duration(milliseconds: 800),
-          curve: Curves.easeInOutBack,
-        );
-      }
-    });
-  }
 
   @override
   void dispose() {
-    _doctorTimer?.cancel();
-    _doctorPageController.dispose();
     super.dispose();
   }
 
@@ -261,15 +242,24 @@ class HomeDashboardState extends State<HomeDashboard> {
     try {
       final history = await PredictionService().getXGBoostHistory();
       if (history.isNotEmpty) {
-        setState(() {
-          _latestPrediction = history.first;
-          _isHistoryLoading = false;
+        // Sort by created_at DESC to ensure we get the latest
+        history.sort((a, b) {
+          final dateA = DateTime.tryParse(a['created_at']?.toString() ?? '') ?? DateTime(1970);
+          final dateB = DateTime.tryParse(b['created_at']?.toString() ?? '') ?? DateTime(1970);
+          return dateB.compareTo(dateA);
         });
+        
+        if (mounted) {
+          setState(() {
+            _latestPrediction = history.first;
+            _isHistoryLoading = false;
+          });
+        }
       } else {
-        setState(() => _isHistoryLoading = false);
+        if (mounted) setState(() => _isHistoryLoading = false);
       }
     } catch (e) {
-      setState(() => _isHistoryLoading = false);
+      if (mounted) setState(() => _isHistoryLoading = false);
     }
   }
 
@@ -385,8 +375,6 @@ class HomeDashboardState extends State<HomeDashboard> {
           _buildRiskAssessmentCard(),
           const SizedBox(height: 24),
           _buildAppointmentsSection(),
-          const SizedBox(height: 24),
-          _buildHealthActivitySection(),
           const SizedBox(height: 100), // Padding for bottom nav
         ],
       ),
@@ -596,7 +584,7 @@ class HomeDashboardState extends State<HomeDashboard> {
                         width: 110,
                         height: 110,
                         child: CircularProgressIndicator(
-                          value: _parseNum(_latestPrediction!['probability']) / 100,
+                          value: _getDisplayProbability() / 100,
                           strokeWidth: 10,
                           backgroundColor: Colors.white.withOpacity(0.05),
                           color: Colors.white.withOpacity(0.8),
@@ -608,7 +596,7 @@ class HomeDashboardState extends State<HomeDashboard> {
                           ShaderMask(
                             shaderCallback: (bounds) => AppColors.silverGradient.createShader(bounds),
                             child: Text(
-                              '${_parseNum(_latestPrediction!['probability']).toStringAsFixed(0)}%',
+                              '${_getDisplayProbability().toStringAsFixed(0)}%',
                               style: GoogleFonts.plusJakartaSans(
                                 color: Colors.white,
                                 fontSize: 24,
@@ -634,7 +622,7 @@ class HomeDashboardState extends State<HomeDashboard> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       _buildScoreRow('HEALTH SCORE', 
-                          '${(100 - _parseNum(_latestPrediction!['probability'])).toStringAsFixed(0)}/100', 
+                          '${(100 - _getDisplayProbability()).toStringAsFixed(0)}/100', 
                           Colors.white),
                       const SizedBox(height: 16),
                       _buildScoreRow('LAST UPDATE', 
@@ -647,6 +635,16 @@ class HomeDashboardState extends State<HomeDashboard> {
             ],
           ),
     );
+  }
+
+  double _getDisplayProbability() {
+    if (_latestPrediction == null) return 0.0;
+    final raw = _latestPrediction!['probability'] ?? _latestPrediction!['probability_score'];
+    double val = _parseNum(raw);
+    // If val is 0.85, it's a fraction, convert to 85.
+    // If it's already 85, keep it.
+    if (val > 0 && val <= 1.0) return val * 100;
+    return val;
   }
 
   double _parseNum(dynamic value) {
@@ -767,6 +765,22 @@ class HomeDashboardState extends State<HomeDashboard> {
     final hasReview = apt['review_submitted'] == true;
     final doctorName = apt['doctor_name'] ?? 'Specialist';
     
+    // Logic for feedback button visibility
+    final now = DateTime.now();
+    bool isExpired = false;
+    try {
+      final slot = apt['slot_details'] ?? {};
+      final dateStr = (apt['date'] ?? slot['date'])?.toString() ?? '';
+      final timeStr = (apt['end_time'] ?? slot['end_time'] ?? '23:59')?.toString() ?? '23:59';
+      if (dateStr.isNotEmpty) {
+        final cleanDate = dateStr.contains('T') ? dateStr.split('T')[0] : dateStr.split(' ')[0];
+        final appointmentEnd = DateTime.parse('${cleanDate} $timeStr');
+        isExpired = now.isAfter(appointmentEnd);
+      }
+    } catch (_) {}
+
+    final showFeedbackButton = (isCompleted || (isExpired && status != 'CANCELLED')) && !hasReview;
+
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(20),
@@ -805,7 +819,7 @@ class HomeDashboardState extends State<HomeDashboard> {
               _buildStatusBadge(status),
             ],
           ),
-          if (isCompleted) ...[
+          if (showFeedbackButton || hasReview) ...[
             const SizedBox(height: 16),
             const Divider(color: Colors.white10),
             const SizedBox(height: 8),
@@ -859,169 +873,31 @@ class HomeDashboardState extends State<HomeDashboard> {
   }
 
 
-  Widget _buildHealthActivitySection() {
-    return Column(
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            ShaderMask(
-              shaderCallback: (bounds) => AppColors.silverGradient.createShader(bounds),
-              child: Text(
-                'Available Specialists',
-                style: GoogleFonts.plusJakartaSans(
-                  color: Colors.white, 
-                  fontSize: 22, 
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: -0.5,
-                ),
-              ),
-            ),
-            if (_doctors.isNotEmpty)
-              TextButton(
-                onPressed: () => Navigator.pushNamed(context, '/doctor-list'),
-                child: Text(
-                  'View all', 
-                  style: GoogleFonts.plusJakartaSans(
-                    color: AppColors.silver500, 
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
-          ],
-        ),
-        const SizedBox(height: 16),
-        if (_isDoctorsLoading)
-          const Center(child: CircularProgressIndicator(color: Colors.white))
-        else if (_doctors.isEmpty)
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(24),
-            decoration: BoxDecoration(
-              color: AppColors.cardBackground,
-              borderRadius: BorderRadius.circular(24),
-              border: Border.all(color: AppColors.cardBorder),
-            ),
-            child: Column(
-              children: [
-                Icon(Icons.person_search_outlined, color: AppColors.silver500.withOpacity(0.5), size: 48),
-                const SizedBox(height: 12),
-                Text(
-                  'No doctors available right now',
-                  style: GoogleFonts.plusJakartaSans(
-                    color: AppColors.silver500,
-                    fontWeight: FontWeight.w600,
-                    fontSize: 14,
-                  ),
-                ),
-              ],
-            ),
-          )
-        else
-          SizedBox(
-            height: 140,
-            child: PageView.builder(
-              controller: _doctorPageController,
-              itemCount: _doctors.length,
-              itemBuilder: (context, index) => Center(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 4),
-                  child: _buildDoctorDashboardCard(_doctors[index]),
-                ),
-              ),
-            ),
-          ),
-      ],
-    );
-  }
+}
 
-  Widget _buildDoctorDashboardCard(Map<String, dynamic> doc) {
-    final String fullName = doc['full_name'] ?? 'Dr. Unknown';
-    final String specialization = doc['qualification'] ?? doc['specialization'] ?? 'Specialist';
-    
-    return Container(
-      width: 280,
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppColors.cardBackground,
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: AppColors.cardBorder),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 56,
-            height: 56,
-            decoration: BoxDecoration(
-              color: const Color(0xFF1A1A1A),
-              shape: BoxShape.circle,
-              border: Border.all(color: Colors.white.withOpacity(0.05), width: 1.5),
-            ),
+class StarRating extends StatelessWidget {
+  final double rating;
+  final Function(double) onRatingChanged;
+
+  const StarRating({super.key, required this.rating, required this.onRatingChanged});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: List.generate(5, (index) {
+        return GestureDetector(
+          onTap: () => onRatingChanged(index + 1.0),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 2),
             child: Icon(
-              Icons.person,
-              color: Colors.white.withOpacity(0.2),
-              size: 28,
+              index < rating ? Icons.star : Icons.star_border,
+              color: index < rating ? Colors.amber : Colors.white24,
+              size: 32,
             ),
           ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  fullName.replaceAll('Dr. ', ''),
-                  style: GoogleFonts.plusJakartaSans(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                    height: 1.1,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  specialization.toUpperCase(),
-                  style: GoogleFonts.plusJakartaSans(
-                    color: AppColors.silver500,
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 0.5,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 12),
-                GestureDetector(
-                  onTap: () => Navigator.pushNamed(
-                    context, 
-                    '/book-appointment', 
-                    arguments: doc,
-                  ),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: const Text(
-                      'BOOK NOW',
-                      style: TextStyle(
-                        color: Colors.black, 
-                        fontSize: 9, 
-                        fontWeight: FontWeight.w900, 
-                        letterSpacing: 0.5
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
+        );
+      }),
     );
   }
 }

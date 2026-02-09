@@ -327,28 +327,6 @@ class PredictionResultScreen extends StatelessWidget {
   Widget _buildActionButtons(BuildContext context, String riskLevel) {
     return Column(
       children: [
-        SizedBox(
-          width: double.infinity,
-          child: ElevatedButton(
-            onPressed: () => Navigator.pushNamed(context, '/doctor-list'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.white,
-              foregroundColor: Colors.black,
-              padding: const EdgeInsets.symmetric(vertical: 20),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-              elevation: 0,
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: const [
-                Icon(Icons.event_outlined, size: 18),
-                SizedBox(width: 12),
-                Text('BOOK SPECIALIST', style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1.5, fontSize: 11)),
-              ],
-            ),
-          ),
-        ),
-        const SizedBox(height: 16),
         TextButton(
           onPressed: () {
             Navigator.of(context).pushNamedAndRemoveUntil(

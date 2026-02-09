@@ -353,14 +353,31 @@ class AppointmentDetailsScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Icon(isActualFeedback ? Icons.chat_bubble_outline : Icons.note_alt_outlined, 
-                       color: AppColors.silver400, size: 18),
-                  const SizedBox(width: 10),
-                  Text(
-                    isActualFeedback ? 'Patient Message' : 'Notes from Visit',
-                    style: const TextStyle(color: AppColors.silver300, fontSize: 12, fontWeight: FontWeight.bold),
+                  Row(
+                    children: [
+                      Icon(isActualFeedback ? Icons.chat_bubble_outline : Icons.note_alt_outlined, 
+                           color: AppColors.silver400, size: 18),
+                      const SizedBox(width: 10),
+                      Text(
+                        isActualFeedback ? 'Patient Message' : 'Notes from Visit',
+                        style: const TextStyle(color: AppColors.silver300, fontSize: 12, fontWeight: FontWeight.bold),
+                      ),
+                    ],
                   ),
+                  if (isActualFeedback)
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: List.generate(5, (index) {
+                        final rating = (apt['rating'] as num?)?.toDouble() ?? 5.0;
+                        return Icon(
+                          index < rating ? Icons.star : Icons.star_border,
+                          color: index < rating ? Colors.amber : Colors.white10,
+                          size: 14,
+                        );
+                      }),
+                    ),
                 ],
               ),
               const SizedBox(height: 14),

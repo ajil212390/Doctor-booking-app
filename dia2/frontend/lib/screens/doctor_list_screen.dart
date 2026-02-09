@@ -172,7 +172,7 @@ class _DoctorListScreenState extends State<DoctorListScreen> {
                         child: ShaderMask(
                           shaderCallback: (bounds) => AppColors.silverGradient.createShader(bounds),
                           child: Text(
-                            'Available\nSpecialists',
+                            'Medical\nSpecialists',
                             style: GoogleFonts.plusJakartaSans(
                               fontSize: 32,
                               fontWeight: FontWeight.bold,
