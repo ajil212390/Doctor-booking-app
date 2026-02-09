@@ -29,32 +29,36 @@ class _ProfileScreenState extends State<ProfileScreen> {
     _loadUserData();
   }
 
-  void _loadUserData() async {
+  Future<void> _loadUserData() async {
     final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      _name = prefs.getString('user_name') ?? 'User';
-      _role = prefs.getString('user_role') ?? 'USER';
-      _email = prefs.getString('user_email') ?? 'user@example.com';
-    });
+    if (mounted) {
+      setState(() {
+        _name = prefs.getString('user_name') ?? 'User';
+        _role = prefs.getString('user_role') ?? 'USER';
+        _email = prefs.getString('user_email') ?? 'user@example.com';
+      });
+    }
     
     // If user is a doctor, fetch doctor profile
     if (_role.toUpperCase() == 'DOCTOR') {
       try {
         final profile = await DoctorService().getDoctorProfile();
-        setState(() {
-          _doctorProfile = profile;
-          // Update name from doctor profile
-          final user = profile['user'];
-          if (user != null) {
-            _name = user['full_name'] ?? _name;
-            _email = user['email'] ?? _email;
-          }
-        });
+        if (mounted) {
+          setState(() {
+            _doctorProfile = profile;
+            // Update name from doctor profile
+            final user = profile['user'];
+            if (user != null) {
+              _name = user['full_name'] ?? _name;
+              _email = user['email'] ?? _email;
+            }
+          });
+        }
       } catch (e) {
       }
     }
     
-    setState(() => _isLoading = false);
+    if (mounted) setState(() => _isLoading = false);
   }
 
   void _showEditProfileDialog() {
@@ -229,11 +233,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
           SafeArea(
             child: _isLoading 
               ? const Center(child: CircularProgressIndicator(color: Colors.white))
-              : SingleChildScrollView(
-                  physics: const BouncingScrollPhysics(),
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
-                  child: Column(
-                    children: [
+              : RefreshIndicator(
+                  onRefresh: _loadUserData,
+                  color: Colors.white,
+                  backgroundColor: const Color(0xFF1A1A1A),
+                  child: SingleChildScrollView(
+                    physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+                    child: Column(
+                      children: [
                       const SizedBox(height: 20),
                       // Header
                       ShaderMask(

@@ -44,7 +44,7 @@ class HomeDashboardState extends State<HomeDashboard> {
     refresh();
   }
 
-  void refresh([Map<String, dynamic>? newData]) {
+  Future<void> refresh([Map<String, dynamic>? newData]) async {
     if (newData != null) {
       if (mounted) {
         setState(() {
@@ -52,14 +52,15 @@ class HomeDashboardState extends State<HomeDashboard> {
           _isHistoryLoading = false;
         });
       }
-      // If we have manual data, we skip loading list to avoid race conditions with server
       _fetchAppointments();
       _checkPendingReviews();
       return;
     }
-    _loadLatestPrediction();
-    _fetchAppointments();
-    _checkPendingReviews();
+    await Future.wait([
+      Future.sync(() => _loadLatestPrediction()),
+      Future.sync(() => _fetchAppointments()),
+      Future.sync(() => _checkPendingReviews()),
+    ]);
   }
 
   void _fetchAppointments() async {
@@ -361,18 +362,24 @@ class HomeDashboardState extends State<HomeDashboard> {
   }
 
   Widget _buildPatientDashboard() {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildHeader(),
-          const SizedBox(height: 16),
-          _buildRiskAssessmentCard(),
-          const SizedBox(height: 24),
-          _buildAppointmentsSection(),
-          const SizedBox(height: 100), // Padding for bottom nav
-        ],
+    return RefreshIndicator(
+      onRefresh: () => refresh(),
+      color: Colors.white,
+      backgroundColor: const Color(0xFF1A1A1A),
+      child: SingleChildScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildHeader(),
+            const SizedBox(height: 16),
+            _buildRiskAssessmentCard(),
+            const SizedBox(height: 24),
+            _buildAppointmentsSection(),
+            const SizedBox(height: 100), // Padding for bottom nav
+          ],
+        ),
       ),
     ).animate().fadeIn(duration: 800.ms);
   }

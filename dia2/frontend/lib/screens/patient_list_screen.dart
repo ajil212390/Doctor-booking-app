@@ -96,40 +96,45 @@ class _PatientListScreenState extends State<PatientListScreen> {
             children: [
               _buildTopBar(context),
               Expanded(
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
-                  physics: const BouncingScrollPhysics(),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const SizedBox(height: 12),
-                      _buildHeader(),
-                      const SizedBox(height: 24),
-                      _buildDatePicker(),
-                      const SizedBox(height: 32),
-                      if (_isLoading)
-                        const Center(child: Padding(
-                          padding: EdgeInsets.only(top: 100),
-                          child: CircularProgressIndicator(color: Colors.white),
-                        ))
-                      else if (_filteredAppointments.isEmpty)
-                        Center(child: Padding(
-                          padding: const EdgeInsets.only(top: 60),
-                          child: Column(
-                            children: [
-                              Icon(Icons.event_busy_rounded, size: 48, color: Colors.white.withOpacity(0.1)),
-                              const SizedBox(height: 12),
-                              Text(
-                                'No appointments for ${DateFormat('MMM d').format(_selectedDate)}',
-                                style: const TextStyle(color: AppColors.silver500),
-                              ),
-                            ],
-                          ),
-                        ))
-                      else
-                        ..._filteredAppointments.map((apt) => _buildPatientCard(apt)),
-                      const SizedBox(height: 120),
-                    ],
+                child: RefreshIndicator(
+                  onRefresh: _fetchAppointments,
+                  color: Colors.white,
+                  backgroundColor: const Color(0xFF1A1A1A),
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.symmetric(horizontal: 24),
+                    physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SizedBox(height: 12),
+                        _buildHeader(),
+                        const SizedBox(height: 24),
+                        _buildDatePicker(),
+                        const SizedBox(height: 32),
+                        if (_isLoading && _appointments.isEmpty)
+                          const Center(child: Padding(
+                            padding: EdgeInsets.only(top: 100),
+                            child: CircularProgressIndicator(color: Colors.white),
+                          ))
+                        else if (_filteredAppointments.isEmpty)
+                          Center(child: Padding(
+                            padding: const EdgeInsets.only(top: 60),
+                            child: Column(
+                              children: [
+                                Icon(Icons.event_busy_rounded, size: 48, color: Colors.white.withOpacity(0.1)),
+                                const SizedBox(height: 12),
+                                Text(
+                                  'No appointments for ${DateFormat('MMM d').format(_selectedDate)}',
+                                  style: const TextStyle(color: AppColors.silver500),
+                                ),
+                              ],
+                            ),
+                          ))
+                        else
+                          ..._filteredAppointments.map((apt) => _buildPatientCard(apt)),
+                        const SizedBox(height: 120),
+                      ],
+                    ),
                   ),
                 ),
               ),

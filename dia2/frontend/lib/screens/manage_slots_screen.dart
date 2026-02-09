@@ -390,77 +390,82 @@ class _ManageSlotsScreenState extends State<ManageSlotsScreen> {
             children: [
               _buildAppBar(context),
               Expanded(
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
-                  physics: const BouncingScrollPhysics(),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const SizedBox(height: 12),
-                      _buildHeader(),
-                      const SizedBox(height: 40),
-                      _buildWeekSelector(),
-                      const SizedBox(height: 20),
-                      _buildWeeklyCalendar(),
-                      const SizedBox(height: 40),
-                      _buildActiveSlotsHeader(),
-                      const SizedBox(height: 16),
-                      if (_isLoading)
-                        const Center(child: Padding(
-                          padding: EdgeInsets.all(40.0),
-                          child: CircularProgressIndicator(color: Colors.white),
-                        ))
-                      else if (_slots.where((slot) => slot['date'] == '${selectedDate.year}-${selectedDate.month.toString().padLeft(2, '0')}-${selectedDate.day.toString().padLeft(2, '0')}').isEmpty)
-                        const Center(child: Padding(
-                          padding: EdgeInsets.all(40.0),
-                          child: Text('No slots for this date', style: TextStyle(color: Color(0xFF94A3B8))),
-                        ))
-                      else
-                        Column(
-                          children: () {
-                            final dateStr = '${selectedDate.year}-${selectedDate.month.toString().padLeft(2, '0')}-${selectedDate.day.toString().padLeft(2, '0')}';
-                            final now = DateTime.now();
-                            final daySlots = _slots.where((slot) {
-                              if (slot['date'] != dateStr) return false;
+                child: RefreshIndicator(
+                  onRefresh: _fetchSlots,
+                  color: Colors.white,
+                  backgroundColor: const Color(0xFF1A1A1A),
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.symmetric(horizontal: 24),
+                    physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SizedBox(height: 12),
+                        _buildHeader(),
+                        const SizedBox(height: 40),
+                        _buildWeekSelector(),
+                        const SizedBox(height: 20),
+                        _buildWeeklyCalendar(),
+                        const SizedBox(height: 40),
+                        _buildActiveSlotsHeader(),
+                        const SizedBox(height: 16),
+                        if (_isLoading && _slots.isEmpty)
+                          const Center(child: Padding(
+                            padding: EdgeInsets.all(40.0),
+                            child: CircularProgressIndicator(color: Colors.white),
+                          ))
+                        else if (_slots.where((slot) => slot['date'] == '${selectedDate.year}-${selectedDate.month.toString().padLeft(2, '0')}-${selectedDate.day.toString().padLeft(2, '0')}').isEmpty)
+                          const Center(child: Padding(
+                            padding: EdgeInsets.all(40.0),
+                            child: Text('No slots for this date', style: TextStyle(color: Color(0xFF94A3B8))),
+                          ))
+                        else
+                          Column(
+                            children: () {
+                              final dateStr = '${selectedDate.year}-${selectedDate.month.toString().padLeft(2, '0')}-${selectedDate.day.toString().padLeft(2, '0')}';
+                              final now = DateTime.now();
+                              final daySlots = _slots.where((slot) {
+                                if (slot['date'] != dateStr) return false;
+                                
+                                try {
+                                  String timeStr = slot['start_time'] ?? '00:00';
+                                  final slotDateTime = DateTime.parse('${slot['date']}T$timeStr');
+                                  return slotDateTime.isAfter(now);
+                                } catch (e) {
+                                  return true; // Keep if we can't parse
+                                }
+                              }).toList();
                               
-                              try {
-                                String timeStr = slot['start_time'] ?? '00:00';
-                                final slotDateTime = DateTime.parse('${slot['date']}T$timeStr');
-                                return slotDateTime.isAfter(now);
-                              } catch (e) {
-                                return true; // Keep if we can't parse
+                              if (daySlots.isEmpty) {
+                                return [
+                                  const Center(child: Padding(
+                                    padding: EdgeInsets.all(40.0),
+                                    child: Text('No upcoming slots for this date', style: TextStyle(color: Color(0xFF94A3B8))),
+                                  ))
+                                ];
                               }
+  
+                              return daySlots.asMap().entries.map((entry) {
+                              int idx = entry.key;
+                              var slot = entry.value;
+                              return Padding(
+                                padding: const EdgeInsets.only(bottom: 16),
+                                child: _buildSessionCard(
+                                  id: (idx + 1).toString().padLeft(2, '0'),
+                                  label: slot['label'] ?? 'SESSION',
+                                  startTime: slot['start_time'] ?? '00:00',
+                                  endTime: slot['end_time'] ?? '00:00',
+                                  accentColor: slot['accentColor'] ?? AppColors.silver500,
+                                  onDelete: () => _removeSlot(slot['id'].toString()),
+                                ),
+                              );
                             }).toList();
-                            
-                            if (daySlots.isEmpty) {
-                              return [
-                                const Center(child: Padding(
-                                  padding: EdgeInsets.all(40.0),
-                                  child: Text('No upcoming slots for this date', style: TextStyle(color: Color(0xFF94A3B8))),
-                                ))
-                              ];
-                            }
-
-                            return daySlots.asMap().entries.map((entry) {
-                            int idx = entry.key;
-                            var slot = entry.value;
-                            return Padding(
-                              padding: const EdgeInsets.only(bottom: 16),
-                              child: _buildSessionCard(
-                                id: (idx + 1).toString().padLeft(2, '0'),
-                                label: slot['label'] ?? 'SESSION',
-                                startTime: slot['start_time'] ?? '00:00',
-                                endTime: slot['end_time'] ?? '00:00',
-                                accentColor: slot['accentColor'] ?? AppColors.silver500,
-                                onDelete: () => _removeSlot(slot['id'].toString()),
-                              ),
-                            );
-                          }).toList();
-                        }(),
-                      ),
-                      const SizedBox(height: 8),
-                      const SizedBox(height: 120), // Bottom space
-                    ],
+                          }(),
+                        ),
+                        const SizedBox(height: 8),
+                        const SizedBox(height: 120), // Bottom space
+                      ],
+                    ),
                   ),
                 ),
               ),

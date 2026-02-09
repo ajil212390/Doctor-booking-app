@@ -58,35 +58,47 @@ class _DoctorReviewsScreenState extends State<DoctorReviewsScreen> {
             colors: [Color(0xFF1A1A1A), Color(0xFF0A0A0A)],
           ),
         ),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 16),
-              if (_isLoading)
-                const Expanded(child: Center(child: CircularProgressIndicator(color: Colors.white)))
-              else if (_feedback.isEmpty)
-                Expanded(
-                  child: Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
+        child: RefreshIndicator(
+          onRefresh: _fetchFeedback,
+          color: Colors.white,
+          backgroundColor: const Color(0xFF1A1A1A),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 16),
+                if (_isLoading && _feedback.isEmpty)
+                  const Expanded(child: Center(child: CircularProgressIndicator(color: Colors.white)))
+                else if (_feedback.isEmpty)
+                  Expanded(
+                    child: ListView(
+                      physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
                       children: [
-                        Icon(Icons.chat_bubble_outline, color: Colors.white.withOpacity(0.1), size: 64),
-                        const SizedBox(height: 16),
-                        const Text('No feedback entries found', style: TextStyle(color: AppColors.silver500)),
+                        SizedBox(height: MediaQuery.of(context).size.height * 0.3),
+                        Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.chat_bubble_outline, color: Colors.white.withOpacity(0.1), size: 64),
+                              const SizedBox(height: 16),
+                              const Text('No feedback entries found', style: TextStyle(color: AppColors.silver500)),
+                            ],
+                          ),
+                        ),
                       ],
                     ),
+                  )
+                else
+                  Expanded(
+                    child: ListView.builder(
+                      physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+                      itemCount: _feedback.length,
+                      itemBuilder: (context, index) => _buildFeedbackCard(_feedback[index]),
+                    ),
                   ),
-                )
-              else
-                Expanded(
-                  child: ListView.builder(
-                    itemCount: _feedback.length,
-                    itemBuilder: (context, index) => _buildFeedbackCard(_feedback[index]),
-                  ),
-                ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

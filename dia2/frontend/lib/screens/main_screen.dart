@@ -150,7 +150,12 @@ class _MainScreenState extends State<MainScreen> {
   Widget _buildNavItem(int index, IconData outlineIcon, IconData filledIcon, String label) {
     bool isActive = _currentIndex == index;
     return GestureDetector(
-      onTap: () => setState(() => _currentIndex = index),
+      onTap: () {
+        if (isActive && index == 0) {
+          _homeKey.currentState?.refresh();
+        }
+        setState(() => _currentIndex = index);
+      },
       behavior: HitTestBehavior.opaque,
       child: Column(
         mainAxisSize: MainAxisSize.min,

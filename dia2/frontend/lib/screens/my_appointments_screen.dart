@@ -26,7 +26,7 @@ class _MyAppointmentsScreenState extends State<MyAppointmentsScreen> {
     _fetchAppointments();
   }
 
-  void _fetchAppointments() async {
+  Future<void> _fetchAppointments() async {
     final prefs = await SharedPreferences.getInstance();
     _role = prefs.getString('user_role') ?? 'USER';
 
@@ -70,23 +70,34 @@ class _MyAppointmentsScreenState extends State<MyAppointmentsScreen> {
           ],
         ),
       ),
-      body: _isLoading 
-        ? const Center(child: CircularProgressIndicator(color: Colors.white))
-        : _appointments.isEmpty
-          ? Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
+      body: RefreshIndicator(
+        onRefresh: _fetchAppointments,
+        color: Colors.white,
+        backgroundColor: const Color(0xFF1A1A1A),
+        child: _isLoading && _appointments.isEmpty
+          ? const Center(child: CircularProgressIndicator(color: Colors.white))
+          : _appointments.isEmpty
+            ? ListView(
+                physics: const AlwaysScrollableScrollPhysics(),
                 children: [
-                  Icon(Icons.event_busy, size: 64, color: Colors.white.withOpacity(0.1)),
-                  const SizedBox(height: 16),
-                  const Text('No appointments found.', style: TextStyle(color: AppColors.silver400, fontSize: 16)),
+                   SizedBox(height: MediaQuery.of(context).size.height * 0.3),
+                   Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.event_busy, size: 64, color: Colors.white.withOpacity(0.1)),
+                        const SizedBox(height: 16),
+                        const Text('No appointments found.', style: TextStyle(color: AppColors.silver400, fontSize: 16)),
+                      ],
+                    ),
+                  ),
                 ],
-              ),
-            )
-          : ListView.builder(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-              itemCount: _appointments.length + 1,
-              itemBuilder: (context, index) {
+              )
+            : ListView.builder(
+                physics: const AlwaysScrollableScrollPhysics(),
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                itemCount: _appointments.length + 1,
+                itemBuilder: (context, index) {
                 if (index == _appointments.length) {
                   return const SizedBox(height: 120);
                 }

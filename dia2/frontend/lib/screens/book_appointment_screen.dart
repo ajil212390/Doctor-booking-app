@@ -133,8 +133,10 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () {
-                    Navigator.of(context).pop();
-                    Navigator.of(context).pushNamedAndRemoveUntil('/user-home', (route) => false);
+                    Navigator.of(context).pop(); // Close dialog
+                    Navigator.of(context).pop(); // Return to Doctor Details/List
+                    // Note: The dashboard will refresh when it becomes visible if handled, 
+                    // or we can use a callback. For now, let's just go back.
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.white,
@@ -192,33 +194,43 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
                   return _buildEmptyState();
                 }
 
-                return Stack(
-                  children: [
-                    SingleChildScrollView(
-                      physics: const BouncingScrollPhysics(),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 24),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const SizedBox(height: 80), // Spacer for header/back button
-                            _buildHeader(),
-                            const SizedBox(height: 40),
-                            _buildDateSelection(),
-                            const SizedBox(height: 40),
-                            _buildTimeSlotSelection(),
-                            const SizedBox(height: 140), // Spacer for fixed button
-                          ],
+                return RefreshIndicator(
+                  onRefresh: () async {
+                    setState(() {
+                      _slotsFuture = DoctorService().getSlots(_doctor['id']);
+                    });
+                    await _slotsFuture;
+                  },
+                  color: Colors.white,
+                  backgroundColor: const Color(0xFF1A1A1A),
+                  child: Stack(
+                    children: [
+                      SingleChildScrollView(
+                        physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 24),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const SizedBox(height: 80), // Spacer for header/back button
+                              _buildHeader(),
+                              const SizedBox(height: 40),
+                              _buildDateSelection(),
+                              const SizedBox(height: 40),
+                              _buildTimeSlotSelection(),
+                              const SizedBox(height: 140), // Spacer for fixed button
+                            ],
+                          ),
                         ),
                       ),
-                    ),
-                    Positioned(
-                      bottom: 40,
-                      left: 24,
-                      right: 24,
-                      child: _buildConfirmButton(),
-                    ),
-                  ],
+                      Positioned(
+                        bottom: 40,
+                        left: 24,
+                        right: 24,
+                        child: _buildConfirmButton(),
+                      ),
+                    ],
+                  ),
                 );
               },
             ),
@@ -530,35 +542,51 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
   }
 
   Widget _buildEmptyState() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+    return RefreshIndicator(
+      onRefresh: () async {
+        setState(() {
+          _slotsFuture = DoctorService().getSlots(_doctor['id']);
+        });
+        await _slotsFuture;
+      },
+      color: Colors.white,
+      backgroundColor: const Color(0xFF1A1A1A),
+      child: ListView(
+        physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
         children: [
-          Container(
-            padding: const EdgeInsets.all(32),
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.03),
-              shape: BoxShape.circle,
-              border: Border.all(color: Colors.white.withOpacity(0.05)),
-            ),
-            child: Icon(Icons.calendar_today_rounded, size: 64, color: Colors.white.withOpacity(0.2)),
-          ),
-          const SizedBox(height: 32),
-          Text(
-            'No Slots Available',
-            style: GoogleFonts.plusJakartaSans(
-              fontSize: 24, 
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-              letterSpacing: -0.5,
-            ),
-          ),
-          const SizedBox(height: 12),
-          Text(
-            'Please check back later',
-            style: TextStyle(
-              color: Colors.white.withOpacity(0.3),
-              fontSize: 14,
+          SizedBox(height: MediaQuery.of(context).size.height * 0.3),
+          Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(32),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.03),
+                    shape: BoxShape.circle,
+                    border: Border.all(color: Colors.white.withOpacity(0.05)),
+                  ),
+                  child: Icon(Icons.calendar_today_rounded, size: 64, color: Colors.white.withOpacity(0.2)),
+                ),
+                const SizedBox(height: 32),
+                Text(
+                  'No Slots Available',
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 24, 
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: -0.5,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  'Please check back later',
+                  style: TextStyle(
+                    color: Colors.white.withOpacity(0.3),
+                    fontSize: 14,
+                  ),
+                ),
+              ],
             ),
           ),
         ],
@@ -567,28 +595,44 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
   }
 
   Widget _buildErrorState(String error) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(32.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(Icons.error_outline, size: 48, color: Colors.redAccent),
-            const SizedBox(height: 16),
-            Text(
-              'Failed to load slots',
-              style: GoogleFonts.plusJakartaSans(fontSize: 24, color: Colors.white, fontWeight: FontWeight.bold),
+    return RefreshIndicator(
+      onRefresh: () async {
+        setState(() {
+          _slotsFuture = DoctorService().getSlots(_doctor['id']);
+        });
+        await _slotsFuture;
+      },
+      color: Colors.white,
+      backgroundColor: const Color(0xFF1A1A1A),
+      child: ListView(
+        physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+        children: [
+          SizedBox(height: MediaQuery.of(context).size.height * 0.3),
+          Center(
+            child: Padding(
+              padding: const EdgeInsets.all(32.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.error_outline, size: 48, color: Colors.redAccent),
+                  const SizedBox(height: 16),
+                  Text(
+                    'Failed to load slots',
+                    style: GoogleFonts.plusJakartaSans(fontSize: 24, color: Colors.white, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 24),
+                  ElevatedButton(
+                    onPressed: () => setState(() {
+                      _slotsFuture = DoctorService().getSlots(_doctor['id']);
+                    }),
+                    style: ElevatedButton.styleFrom(backgroundColor: Colors.white, foregroundColor: Colors.black),
+                    child: const Text('RETRY'),
+                  ),
+                ],
+              ),
             ),
-            const SizedBox(height: 24),
-            ElevatedButton(
-              onPressed: () => setState(() {
-                _slotsFuture = DoctorService().getSlots(_doctor['id']);
-              }),
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.white, foregroundColor: Colors.black),
-              child: const Text('RETRY'),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

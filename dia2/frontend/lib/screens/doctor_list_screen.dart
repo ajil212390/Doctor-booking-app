@@ -117,33 +117,38 @@ class _DoctorListScreenState extends State<DoctorListScreen> {
           ),
           
           SafeArea(
-            child: _isLoading 
+            child: _isLoading && _doctors.isEmpty
               ? const Center(child: CircularProgressIndicator(color: Colors.white70))
-              : _error != null 
+              : _error != null && _doctors.isEmpty
                 ? _buildErrorState(_error!)
-                : CustomScrollView(
-                    physics: const BouncingScrollPhysics(),
-                    slivers: [
-                      _buildHeader(_doctors.length),
-                      if (_doctors.isEmpty)
-                        SliverFillRemaining(
-                          child: _buildEmptyState(),
-                        )
-                      else
-                        SliverPadding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                          sliver: SliverList(
-                            delegate: SliverChildBuilderDelegate(
-                              (context, index) {
-                                final doc = _doctors[index];
-                                return _buildDoctorCard(context, doc, index);
-                              },
-                              childCount: _doctors.length,
+                : RefreshIndicator(
+                    onRefresh: _loadDoctors,
+                    color: Colors.white,
+                    backgroundColor: const Color(0xFF1A1A1A),
+                    child: CustomScrollView(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      slivers: [
+                        _buildHeader(_doctors.length),
+                        if (_doctors.isEmpty)
+                          SliverFillRemaining(
+                            child: _buildEmptyState(),
+                          )
+                        else
+                          SliverPadding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                            sliver: SliverList(
+                              delegate: SliverChildBuilderDelegate(
+                                (context, index) {
+                                  final doc = _doctors[index];
+                                  return _buildDoctorCard(context, doc, index);
+                                },
+                                childCount: _doctors.length,
+                              ),
                             ),
                           ),
-                        ),
-                      const SliverToBoxAdapter(child: SizedBox(height: 100)),
-                    ],
+                        const SliverToBoxAdapter(child: SizedBox(height: 100)),
+                      ],
+                    ),
                   ),
           ),
           
