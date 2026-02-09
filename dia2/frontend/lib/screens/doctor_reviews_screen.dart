@@ -106,8 +106,8 @@ class _DoctorReviewsScreenState extends State<DoctorReviewsScreen> {
   }
 
   Widget _buildFeedbackCard(dynamic f) {
-    final patientName = f['patient_name'] ?? 'Verified User';
-    final comment = f['feedback_text'] ?? '';
+    final patientName = f['patient_name'] ?? f['user_name'] ?? 'Verified User';
+    final comment = f['comment'] ?? f['feedback_text'] ?? '';
     final dateStr = f['created_at'] != null 
         ? DateFormat('MMMM d, yyyy').format(DateTime.parse(f['created_at']))
         : 'Recently';

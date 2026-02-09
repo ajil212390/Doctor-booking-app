@@ -41,19 +41,19 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
       
       for (var apt in _appointments) {
         // Try multiple keys for feedback text
-        final fText = apt['feedback_text'] ?? apt['feedback'] ?? (apt['review'] is Map ? apt['review']['text'] : null);
+        final fText = apt['comment'] ?? apt['feedback_text'] ?? apt['feedback'] ?? (apt['review'] is Map ? apt['review']['text'] : null);
         final ratingVal = apt['rating'] ?? (apt['review'] is Map ? apt['review']['rating'] : null);
         
         // If we found either text OR a rating, it's feedback
         if ((fText != null && fText.toString().trim().isNotEmpty) || ratingVal != null) {
           bool exists = aggregatedFeedback.any((f) => f['id'] == apt['id'] || 
                                                      (f['appointment_id'] == apt['id']) ||
-                                                     (fText != null && f['feedback_text'] == fText));
+                                                     (fText != null && (f['comment'] == fText || f['feedback_text'] == fText)));
           if (!exists) {
             aggregatedFeedback.add({
               'id': apt['id'],
               'patient_name': apt['patient_name'] ?? apt['patient_full_name'] ?? (apt['patient'] is Map ? apt['patient']['full_name'] : 'Patient'),
-              'feedback_text': fText ?? 'Rating only',
+              'comment': fText ?? 'Rating only',
               'rating': ratingVal ?? 5.0,
               'created_at': apt['updated_at'] ?? apt['date'] ?? apt['created_at'],
             });
@@ -516,8 +516,8 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
   }
 
   Widget _buildFeedbackCard(dynamic f) {
-    final patientName = f['patient_name'] ?? 'Verified User';
-    final comment = f['feedback_text'] ?? '';
+    final patientName = f['patient_name'] ?? f['user_name'] ?? 'Verified User';
+    final comment = f['comment'] ?? f['feedback_text'] ?? '';
     final dateStr = f['created_at'] != null 
         ? DateFormat('MMM d, yyyy').format(DateTime.parse(f['created_at']))
         : 'Recently';

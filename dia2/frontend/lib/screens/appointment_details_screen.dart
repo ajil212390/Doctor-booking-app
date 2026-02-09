@@ -330,8 +330,8 @@ class AppointmentDetailsScreen extends StatelessWidget {
   }
 
   Widget _buildFeedbackSection(Map<String, dynamic> apt) {
-    final feedback = apt['feedback_text'] ?? apt['notes'] ?? 'No feedback provided yet.';
-    final isActualFeedback = apt['feedback_text'] != null;
+    final feedback = apt['comment'] ?? apt['feedback_text'] ?? apt['notes'] ?? 'No feedback provided yet.';
+    final isActualFeedback = apt['comment'] != null || apt['feedback_text'] != null;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
