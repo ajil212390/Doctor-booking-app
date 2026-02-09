@@ -89,7 +89,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           Navigator.pop(context);
         }
       } else {
-        await AuthService().register(
+        final result = await AuthService().register(
           email: _emailController.text,
           password: _passwordController.text,
           passwordConfirm: _passwordConfirmController.text,
@@ -98,9 +98,20 @@ class _RegisterScreenState extends State<RegisterScreen> {
           phone: _phoneController.text,
           role: _selectedRole,
         );
+        
         if (mounted) {
-          AppToast.show(context, 'Registration Successful! Please login.', isError: false);
-          Navigator.pop(context);
+          AppToast.show(context, 'Registration Successful!', isError: false);
+          
+          // Automatically log in after registration
+          try {
+            await AuthService().login(_emailController.text, _passwordController.text);
+            if (mounted) {
+              Navigator.pushNamedAndRemoveUntil(context, '/dashboard', (route) => false);
+            }
+          } catch (e) {
+            // If auto-login fails, just go to login screen
+            if (mounted) Navigator.pop(context);
+          }
         }
       }
     } catch (e) {
