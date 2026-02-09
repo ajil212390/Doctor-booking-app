@@ -32,6 +32,7 @@ class HomeDashboardState extends State<HomeDashboard> {
   List<dynamic> _appointments = [];
   bool _isHistoryLoading = true;
   bool _isAppointmentsLoading = true;
+  final Set<int> _dismissedReviewIds = {};
   
   @override
   void initState() {
@@ -88,11 +89,27 @@ class HomeDashboardState extends State<HomeDashboard> {
     
     try {
       final appointments = await DoctorService().getUserAppointments();
+      final prefs = await SharedPreferences.getInstance();
       final now = DateTime.now();
       
       final pendingReview = appointments.firstWhere(
         (apt) {
+          final id = apt['id'] as int?;
+          if (id == null || _dismissedReviewIds.contains(id)) return false;
+          
+          // Backend check: already submitted
           if (apt['review_submitted'] == true) return false;
+          
+          // Frontend check: persistent dismissal cooldown (24 hours)
+          final dismissedAtStr = prefs.getString('review_dismissed_at_$id');
+          if (dismissedAtStr != null) {
+            final dismissedAt = DateTime.tryParse(dismissedAtStr);
+            if (dismissedAt != null) {
+              if (now.difference(dismissedAt).inHours < 24) {
+                return false;
+              }
+            }
+          }
           
           final status = apt['status']?.toString().toUpperCase() ?? 'PENDING';
           final isCompleted = status == 'COMPLETED';
@@ -128,6 +145,7 @@ class HomeDashboardState extends State<HomeDashboard> {
   void _showReviewDialog(dynamic appointment) {
     final TextEditingController reviewController = TextEditingController();
     final doctorName = appointment['doctor_name'] ?? 'your doctor';
+    final int appointmentId = appointment['id'];
     double currentRating = 5.0;
 
     showDialog(
@@ -187,7 +205,12 @@ class HomeDashboardState extends State<HomeDashboard> {
             ),
             actions: [
               TextButton(
-                onPressed: () => Navigator.pop(context),
+                onPressed: () async {
+                  _dismissedReviewIds.add(appointmentId);
+                  final prefs = await SharedPreferences.getInstance();
+                  await prefs.setString('review_dismissed_at_$appointmentId', DateTime.now().toIso8601String());
+                  if (mounted) Navigator.pop(context);
+                },
                 child: const Text('LATER', style: TextStyle(color: AppColors.silver500)),
               ),
               TextButton(
@@ -196,10 +219,13 @@ class HomeDashboardState extends State<HomeDashboard> {
                   
                   try {
                     await DoctorService().submitFeedback(
-                      appointmentId: appointment['id'],
+                      appointmentId: appointmentId,
                       feedback: text.isEmpty ? "Great consultation!" : text, // Default text if empty
                       rating: currentRating,
                     );
+                    _dismissedReviewIds.add(appointmentId);
+                    final prefs = await SharedPreferences.getInstance();
+                    await prefs.remove('review_dismissed_at_$appointmentId'); // Clear cooldown on success
                     if (mounted) {
                       Navigator.pop(context);
                       AppToast.show(context, 'Success! Feedback shared.', isError: false);

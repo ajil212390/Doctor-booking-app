@@ -191,6 +191,7 @@ class _MyAppointmentsScreenState extends State<MyAppointmentsScreen> {
                 ).animate().fadeIn(delay: (index * 100).ms, duration: 500.ms).slideX(begin: -0.1, end: 0);
               },
             ),
+      ),
     );
   }
 
