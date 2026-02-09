@@ -101,13 +101,33 @@ class DoctorService {
 
     final responseData = jsonDecode(response.body);
     if (response.statusCode == 200) {
-      // Handle both wrapped and direct response
       if (responseData is Map<String, dynamic>) {
         return responseData['data'] ?? responseData;
       }
       return responseData;
     } else {
       throw Exception(responseData['message'] ?? 'Failed to fetch doctor profile');
+    }
+  }
+
+  /// Fetch the logged-in user's profile
+  Future<Map<String, dynamic>> getUserProfile() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('access_token');
+
+    final response = await http.get(
+      Uri.parse('${_baseUrl}${ApiConfig.userProfile}'),
+      headers: {'Authorization': 'Bearer $token'},
+    );
+
+    final responseData = jsonDecode(response.body);
+    if (response.statusCode == 200) {
+      if (responseData is Map<String, dynamic>) {
+        return responseData['data'] ?? responseData;
+      }
+      return responseData;
+    } else {
+      throw Exception(responseData['message'] ?? 'Failed to fetch user profile');
     }
   }
   /// Fetch the logged-in user's booked appointments
@@ -246,6 +266,75 @@ class DoctorService {
       return [];
     } catch (e) {
       return [];
+    }
+  }
+
+  /// Upload profile picture for the logged-in doctor
+  Future<Map<String, dynamic>> updateDoctorProfileWithImage(String imagePath) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('access_token');
+
+    final request = http.MultipartRequest(
+      'PATCH',
+      Uri.parse('${_baseUrl}${ApiConfig.doctorProfile}'),
+    )..headers['Authorization'] = 'Bearer $token'
+     ..files.add(await http.MultipartFile.fromPath('profile_picture', imagePath));
+
+    final streamedResponse = await request.send();
+    final response = await http.Response.fromStream(streamedResponse);
+    final responseData = jsonDecode(response.body);
+
+    if (response.statusCode == 200) {
+      return responseData['data'] ?? responseData;
+    } else {
+      throw Exception(responseData['message'] ?? 'Failed to update profile picture');
+    }
+  }
+
+  /// Upload profile picture for a regular user
+  Future<Map<String, dynamic>> updateUserProfileWithImage(String imagePath) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('access_token');
+
+    final request = http.MultipartRequest(
+      'PATCH',
+      Uri.parse('${_baseUrl}${ApiConfig.userProfile}'),
+    )..headers['Authorization'] = 'Bearer $token'
+     ..files.add(await http.MultipartFile.fromPath('profile_picture', imagePath));
+
+    final streamedResponse = await request.send();
+    final response = await http.Response.fromStream(streamedResponse);
+    final responseData = jsonDecode(response.body);
+
+    if (response.statusCode == 200) {
+      return responseData['data'] ?? responseData;
+    } else {
+      throw Exception(responseData['message'] ?? 'Failed to update user profile picture');
+    }
+  }
+
+  /// Update user profile text data
+  Future<Map<String, dynamic>> updateUserProfile({String? fullName, String? email}) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('access_token');
+
+    final response = await http.patch(
+      Uri.parse('${_baseUrl}${ApiConfig.userProfile}'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+      body: jsonEncode({
+        if (fullName != null) 'full_name': fullName,
+        if (email != null) 'email': email,
+      }),
+    );
+
+    final responseData = jsonDecode(response.body);
+    if (response.statusCode == 200) {
+      return responseData['data'] ?? responseData;
+    } else {
+      throw Exception(responseData['message'] ?? 'Failed to update profile');
     }
   }
 }

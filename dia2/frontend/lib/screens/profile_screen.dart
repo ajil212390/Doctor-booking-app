@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:image_picker/image_picker.dart';
 import 'dart:ui';
 import '../services/auth_service.dart';
 import '../services/doctor_service.dart';
+import '../services/api_config.dart';
 import '../theme/app_theme.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -18,7 +20,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
   String _name = 'User';
   String _email = 'user@example.com';
   String _role = 'USER';
+  String? _profilePicture;
   bool _isLoading = true;
+  bool _isUploading = false;
   
   // Doctor-specific fields
   Map<String, dynamic>? _doctorProfile;
@@ -50,6 +54,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         if (mounted) {
           setState(() {
             _doctorProfile = profile;
+            _profilePicture = profile['profile_picture'];
             // Update name from doctor profile
             final user = profile['user'];
             if (user != null) {
@@ -61,6 +66,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
       } catch (e) {
       }
     } else {
+      // Fetch normal user profile to get DP
+      try {
+        final profile = await DoctorService().getUserProfile();
+        if (mounted) {
+          setState(() {
+            _profilePicture = profile['profile_picture'];
+            _name = profile['full_name'] ?? _name;
+            _email = profile['email'] ?? _email;
+          });
+        }
+      } catch (e) {
+      }
+
       // Fetch medical history for regular users
       setState(() => _isHistoryLoading = true);
       try {
@@ -109,6 +127,44 @@ class _ProfileScreenState extends State<ProfileScreen> {
     if (mounted) setState(() => _isLoading = false);
   }
 
+  Future<void> _pickAndUploadImage() async {
+    final picker = ImagePicker();
+    final XFile? image = await picker.pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 70,
+    );
+
+    if (image == null) return;
+
+    if (mounted) setState(() => _isUploading = true);
+
+    try {
+      Map<String, dynamic> updatedProfile;
+      if (_role.toUpperCase() == 'DOCTOR') {
+        updatedProfile = await DoctorService().updateDoctorProfileWithImage(image.path);
+      } else {
+        updatedProfile = await DoctorService().updateUserProfileWithImage(image.path);
+      }
+
+      if (mounted) {
+        setState(() {
+          _profilePicture = updatedProfile['profile_picture'];
+          _isUploading = false;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Profile picture updated successfully')),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isUploading = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: $e')),
+        );
+      }
+    }
+  }
+
   void _showEditProfileDialog() {
     final nameController = TextEditingController(text: _name);
     final emailController = TextEditingController(text: _email);
@@ -154,16 +210,36 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     onPressed: () => Navigator.pop(context),
                     child: const Text('CANCEL', style: TextStyle(color: Color(0xFF64748B))),
                   ),
-                  ElevatedButton(
+                   ElevatedButton(
                     onPressed: () async {
-                      final prefs = await SharedPreferences.getInstance();
-                      await prefs.setString('user_name', nameController.text);
-                      await prefs.setString('user_email', emailController.text);
-                      setState(() {
-                        _name = nameController.text;
-                        _email = emailController.text;
-                      });
-                      if (mounted) Navigator.pop(context);
+                      try {
+                        // Call backend to update
+                        await DoctorService().updateUserProfile(
+                          fullName: nameController.text,
+                          email: emailController.text,
+                        );
+
+                        final prefs = await SharedPreferences.getInstance();
+                        await prefs.setString('user_name', nameController.text);
+                        await prefs.setString('user_email', emailController.text);
+                        
+                        if (mounted) {
+                          setState(() {
+                            _name = nameController.text;
+                            _email = emailController.text;
+                          });
+                          Navigator.pop(context);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Profile updated successfully')),
+                          );
+                        }
+                      } catch (e) {
+                        if (mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('Failed to update: $e')),
+                          );
+                        }
+                      }
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.white,
@@ -331,14 +407,25 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 child: CircleAvatar(
                                   radius: 64,
                                   backgroundColor: const Color(0xFF2A2A2A),
-                                  child: Text(
-                                    _name.isNotEmpty ? _name[0].toUpperCase() : 'U',
-                                    style: GoogleFonts.plusJakartaSans(
-                                      fontSize: 48,
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
+                                  backgroundImage: _profilePicture != null
+                                      ? NetworkImage(
+                                          _profilePicture!.startsWith('http')
+                                              ? _profilePicture!
+                                              : '${ApiConfig.baseUrl.replaceAll('/api/', '')}$_profilePicture',
+                                        )
+                                      : null,
+                                  child: _isUploading 
+                                    ? const CircularProgressIndicator(color: Colors.white)
+                                    : (_profilePicture == null
+                                      ? Text(
+                                          _name.isNotEmpty ? _name[0].toUpperCase() : 'U',
+                                          style: GoogleFonts.plusJakartaSans(
+                                            fontSize: 48,
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        )
+                                      : null),
                                 ),
                               ),
                             ),
@@ -346,7 +433,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               bottom: 4,
                               right: 4,
                               child: GestureDetector(
-                                onTap: _showEditProfileDialog,
+                                onTap: _pickAndUploadImage,
                                 child: Container(
                                   padding: const EdgeInsets.all(10),
                                   decoration: BoxDecoration(
@@ -409,6 +496,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
 
                       const SizedBox(height: 40),
+
+                      _buildProfileCard(Icons.person_outline, 'Personal Information', 'Identity and health data', onTap: _showEditProfileDialog),
+                      const SizedBox(height: 16),
 
                       // Doctor-specific information
                       if (isDoctor && _doctorProfile != null) ...[
@@ -493,8 +583,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         _buildStatusCard(),
                       ] else ...[
                         // Regular user options
-                        _buildProfileCard(Icons.person_outline, 'Personal Information', 'Identity and health data', onTap: _showEditProfileDialog),
-                        
                         const SizedBox(height: 32),
                         _buildSectionTitle('MEDICAL HISTORY'),
                         const SizedBox(height: 16),
