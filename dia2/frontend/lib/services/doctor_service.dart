@@ -222,4 +222,30 @@ class DoctorService {
     }
   }
 
+  /// Fetch the logged-in user's medical history (past appointments)
+  Future<List<dynamic>> getMedicalHistory() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('access_token');
+
+      final response = await http.get(
+        Uri.parse('${_baseUrl}${ApiConfig.medicalHistory}'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Accept': 'application/json',
+        },
+      ).timeout(const Duration(seconds: 10));
+
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+        if (responseData is List) return responseData;
+        if (responseData is Map) {
+          return responseData['results'] ?? responseData['data'] ?? responseData['medical_history'] ?? [];
+        }
+      }
+      return [];
+    } catch (e) {
+      return [];
+    }
+  }
 }

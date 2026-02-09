@@ -23,6 +23,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
   // Doctor-specific fields
   Map<String, dynamic>? _doctorProfile;
 
+  // Medical History
+  List<dynamic> _medicalHistory = [];
+  bool _isHistoryLoading = false;
+
   @override
   void initState() {
     super.initState();
@@ -55,6 +59,50 @@ class _ProfileScreenState extends State<ProfileScreen> {
           });
         }
       } catch (e) {
+      }
+    } else {
+      // Fetch medical history for regular users
+      setState(() => _isHistoryLoading = true);
+      try {
+        final results = await Future.wait([
+          DoctorService().getMedicalHistory(),
+          DoctorService().getUserAppointments(),
+        ]);
+        
+        final history = results[0];
+        final appointments = results[1];
+        
+        if (mounted) {
+          setState(() {
+            // Combine dedicated history with COMPLETED appointments
+            final List<dynamic> combinedHistory = List.from(history);
+            
+            for (var apt in appointments) {
+              final status = (apt['status'] ?? '').toString().toUpperCase();
+              final id = apt['id'];
+              
+              // If it's COMPLETED or CANCELLED, it's part of "History"
+              if (status == 'COMPLETED' || status == 'CANCELLED') {
+                bool alreadyExists = combinedHistory.any((h) => h['id'] == id || h['appointment_id'] == id);
+                if (!alreadyExists) {
+                  combinedHistory.add({
+                    'id': id,
+                    'doctor_name': apt['doctor_name'] ?? (apt['doctor'] is Map ? apt['doctor']['full_name'] : 'Doctor'),
+                    'date': apt['date'] ?? (apt['slot_details'] != null ? apt['slot_details']['date'] : 'Recent'),
+                    'diagnosis': status == 'COMPLETED' ? 'Consultation Completed' : 'Appointment Cancelled',
+                    'notes': apt['notes'] ?? apt['comment'] ?? 'General Visit',
+                    'appointment_id': id,
+                  });
+                }
+              }
+            }
+            
+            _medicalHistory = combinedHistory;
+            _isHistoryLoading = false;
+          });
+        }
+      } catch (e) {
+        if (mounted) setState(() => _isHistoryLoading = false);
       }
     }
     
@@ -446,6 +494,34 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ] else ...[
                         // Regular user options
                         _buildProfileCard(Icons.person_outline, 'Personal Information', 'Identity and health data', onTap: _showEditProfileDialog),
+                        
+                        const SizedBox(height: 32),
+                        _buildSectionTitle('MEDICAL HISTORY'),
+                        const SizedBox(height: 16),
+                        if (_isHistoryLoading)
+                          const Center(child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                        else if (_medicalHistory.isEmpty)
+                          Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.all(24),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.03),
+                              borderRadius: BorderRadius.circular(24),
+                              border: Border.all(color: Colors.white.withOpacity(0.1)),
+                            ),
+                            child: Column(
+                              children: [
+                                Icon(Icons.history_outlined, size: 32, color: Colors.white.withOpacity(0.1)),
+                                const SizedBox(height: 12),
+                                const Text(
+                                  'No past medical history found.',
+                                  style: TextStyle(color: Color(0xFF64748B), fontSize: 13),
+                                ),
+                              ],
+                            ),
+                          )
+                        else
+                          ..._medicalHistory.map((history) => _buildHistoryItem(history)).toList(),
                       ],
                       
                       const SizedBox(height: 48),
@@ -675,5 +751,67 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
       ),
     ).animate().fadeIn(duration: 500.ms).slideX(begin: 0.05, end: 0);
+  }
+
+  Widget _buildHistoryItem(dynamic history) {
+    final doctorName = history['doctor_name'] ?? 'Doctor';
+    final date = history['date'] ?? 'No date';
+    final notes = history['notes'] ?? 'General Consultation';
+    final diagnosis = history['diagnosis'] ?? 'Checkup';
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.03),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.white.withOpacity(0.06)),
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.05),
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(Icons.description_outlined, color: Colors.white70, size: 20),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      doctorName,
+                      style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
+                    ),
+                    Text(
+                      date,
+                      style: const TextStyle(color: Color(0xFF64748B), fontSize: 10),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  diagnosis,
+                  style: const TextStyle(color: Colors.white70, fontSize: 12, fontWeight: FontWeight.w500),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  notes,
+                  style: const TextStyle(color: Color(0xFF64748B), fontSize: 11),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    ).animate().fadeIn(duration: 400.ms).slideX(begin: 0.02, end: 0);
   }
 }

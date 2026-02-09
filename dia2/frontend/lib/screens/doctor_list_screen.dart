@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'dart:ui';
 import '../services/doctor_service.dart';
 import '../services/location_service.dart';
+import '../services/api_config.dart';
 import '../theme/app_theme.dart';
 
 class DoctorListScreen extends StatefulWidget {
@@ -446,11 +447,25 @@ class _DoctorListScreenState extends State<DoctorListScreen> {
                   shape: BoxShape.circle,
                   border: Border.all(color: Colors.white.withOpacity(0.05), width: 2),
                 ),
-                alignment: Alignment.center,
-                child: Icon(
-                  Icons.person,
-                  size: 32,
-                  color: Colors.white.withOpacity(0.2),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(30),
+                  child: doc['profile_picture'] != null 
+                    ? Image.network(
+                        doc['profile_picture'].toString().startsWith('http') 
+                          ? doc['profile_picture'] 
+                          : '${ApiConfig.baseUrl.replaceAll('/api/', '')}${doc['profile_picture']}',
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) => Icon(
+                          Icons.person,
+                          size: 32,
+                          color: Colors.white.withOpacity(0.2),
+                        ),
+                      )
+                    : Icon(
+                        Icons.person,
+                        size: 32,
+                        color: Colors.white.withOpacity(0.2),
+                      ),
                 ),
               ),
             ],

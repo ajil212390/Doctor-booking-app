@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../services/doctor_service.dart';
+import '../services/api_config.dart';
 import '../theme/app_theme.dart';
 
 class DoctorDashboard extends StatefulWidget {
@@ -40,20 +41,39 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
       final List<dynamic> aggregatedFeedback = List.from(feedbackList);
       
       for (var apt in _appointments) {
-        // Try multiple keys for feedback text
-        final fText = apt['comment'] ?? apt['feedback_text'] ?? apt['feedback'] ?? (apt['review'] is Map ? apt['review']['text'] : null);
-        final ratingVal = apt['rating'] ?? (apt['review'] is Map ? apt['review']['rating'] : null);
+        // Advanced extraction of feedback text and rating
+        dynamic fRawText = apt['comment'] ?? apt['feedback_text'] ?? apt['feedback'] ?? apt['review'];
+        dynamic fText;
+        
+        if (fRawText is Map) {
+          fText = fRawText['comment'] ?? fRawText['feedback_text'] ?? fRawText['text'] ?? fRawText['feedback'];
+        } else {
+          fText = fRawText;
+        }
+
+        final ratingVal = apt['rating'] ?? 
+                         (apt['review'] is Map ? apt['review']['rating'] : null) ?? 
+                         (apt['feedback'] is Map ? apt['feedback']['rating'] : null);
         
         // If we found either text OR a rating, it's feedback
         if ((fText != null && fText.toString().trim().isNotEmpty) || ratingVal != null) {
           bool exists = aggregatedFeedback.any((f) => f['id'] == apt['id'] || 
                                                      (f['appointment_id'] == apt['id']) ||
-                                                     (fText != null && (f['comment'] == fText || f['feedback_text'] == fText)));
+                                                     (fText != null && (f['comment'].toString() == fText.toString() || f['feedback_text'].toString() == fText.toString())));
           if (!exists) {
+            String pName = 'Patient';
+            if (apt['patient_name'] != null) {
+              pName = apt['patient_name'].toString();
+            } else if (apt['patient_full_name'] != null) {
+              pName = apt['patient_full_name'].toString();
+            } else if (apt['patient'] is Map) {
+              pName = apt['patient']['full_name']?.toString() ?? 'Patient';
+            }
+
             aggregatedFeedback.add({
               'id': apt['id'],
-              'patient_name': apt['patient_name'] ?? apt['patient_full_name'] ?? (apt['patient'] is Map ? apt['patient']['full_name'] : 'Patient'),
-              'comment': fText ?? 'Rating only',
+              'patient_name': pName,
+              'comment': fText?.toString() ?? 'Rating only',
               'rating': ratingVal ?? 5.0,
               'created_at': apt['updated_at'] ?? apt['date'] ?? apt['created_at'],
             });
@@ -100,12 +120,33 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
     }
   }
 
+  String? _profileUrl;
+
   Future<void> _loadDoctorName() async {
     final prefs = await SharedPreferences.getInstance();
-    final name = prefs.getString('user_name') ?? 'Ramen';
-    setState(() {
-      _doctorName = name.startsWith('Dr.') ? name : 'Dr. $name';
-    });
+    final cachedName = prefs.getString('user_name') ?? 'Ramen';
+    
+    if (mounted) {
+      setState(() {
+        _doctorName = cachedName.startsWith('Dr.') ? cachedName : 'Dr. $cachedName';
+      });
+    }
+
+    try {
+      final profile = await DoctorService().getDoctorProfile();
+      if (mounted) {
+        setState(() {
+          _profileUrl = profile['profile_picture'];
+          final user = profile['user'];
+          if (user != null) {
+            String name = user['full_name'] ?? cachedName;
+            _doctorName = name.startsWith('Dr.') ? name : 'Dr. $name';
+          }
+        });
+      }
+    } catch (e) {
+      // Keep cached data
+    }
   }
   
   @override
@@ -166,7 +207,7 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
               shaderCallback: (bounds) => AppColors.silverGradient.createShader(bounds),
               child: Text(
                 _doctorName,
-                style: TextStyle(
+                style: const TextStyle(
                   color: Colors.white,
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
@@ -202,17 +243,33 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
           ),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(24),
-            child: Container(
-              alignment: Alignment.center,
-              decoration: const BoxDecoration(
-                color: Color(0xFF1A1A1A),
-              ),
-              child: Icon(
-                Icons.person,
-                color: Colors.white.withOpacity(0.2),
-                size: 24,
-              ),
-            ),
+            child: _profileUrl != null
+              ? Image.network(
+                  _profileUrl!.startsWith('http') 
+                    ? _profileUrl! 
+                    : '${ApiConfig.baseUrl.replaceAll('/api/', '')}$_profileUrl',
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) => Container(
+                    alignment: Alignment.center,
+                    color: const Color(0xFF1A1A1A),
+                    child: Icon(
+                      Icons.person,
+                      color: Colors.white.withOpacity(0.2),
+                      size: 24,
+                    ),
+                  ),
+                )
+              : Container(
+                  alignment: Alignment.center,
+                  decoration: const BoxDecoration(
+                    color: Color(0xFF1A1A1A),
+                  ),
+                  child: Icon(
+                    Icons.person,
+                    color: Colors.white.withOpacity(0.2),
+                    size: 24,
+                  ),
+                ),
           ),
         ),
       ],
@@ -316,10 +373,21 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
             ...todaysAppointments.take(3).map((appointment) {
               final slot = appointment['slot_details'] ?? {};
               final startTime = appointment['start_time'] ?? slot['start_time'] ?? '09:00';
-              final patientName = appointment['patient_name'] ?? 
-                                 appointment['patient_full_name'] ?? 
-                                 'Patient';
-              final notes = appointment['notes'] ?? 'General Checkup';
+              // Safe extraction of patient name
+              String patientName = 'Patient';
+              if (appointment['patient_name'] != null) {
+                patientName = appointment['patient_name'].toString();
+              } else if (appointment['patient_full_name'] != null) {
+                patientName = appointment['patient_full_name'].toString();
+              } else if (appointment['patient'] is Map) {
+                patientName = appointment['patient']['full_name']?.toString() ?? 'Patient';
+              }
+              
+              // Safe extraction of notes/type
+              String notes = 'General Checkup';
+              if (appointment['notes'] != null && appointment['notes'].toString().isNotEmpty) {
+                notes = appointment['notes'].toString();
+              }
               
               // Simple time parsing for AM/PM
               final cleanTime = startTime.contains('T') ? startTime.split('T')[1] : startTime;
