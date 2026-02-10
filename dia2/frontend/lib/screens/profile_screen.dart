@@ -191,7 +191,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 title: Text(
                   'EDIT PROFILE',
                   style: GoogleFonts.plusJakartaSans(
-                    color: Colors.white,
+                    color: AppColors.textOnSurface,
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                     letterSpacing: 1,
@@ -242,8 +242,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       }
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.white,
-                      foregroundColor: Colors.black,
+                      backgroundColor: AppColors.purple,
+                      foregroundColor: Colors.white,
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     ),
                     child: const Text('SAVE CHANGES'),
@@ -263,7 +263,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       children: [
         Text(
           label,
-          style: const TextStyle(color: Color(0xFF64748B), fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1.5),
+          style: const TextStyle(color: AppColors.silver500, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1.5),
         ),
         const SizedBox(height: 8),
         Container(
@@ -274,9 +274,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
           child: TextField(
             controller: controller,
-            style: const TextStyle(color: Colors.white, fontSize: 14),
+            style: const TextStyle(color: AppColors.textOnSurface, fontSize: 14),
             decoration: InputDecoration(
-              prefixIcon: Icon(icon, color: Colors.white.withOpacity(0.3), size: 18),
+              prefixIcon: Icon(icon, color: AppColors.textOnSurface.withValues(alpha: 0.3), size: 18),
               border: InputBorder.none,
               contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             ),
@@ -306,12 +306,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   borderRadius: BorderRadius.circular(32),
                   side: const BorderSide(color: AppColors.border),
                 ),
-                title: Text('LOGOUT', style: GoogleFonts.plusJakartaSans(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
-                content: const Text('Are you sure you want to end your session?', style: TextStyle(color: Color(0xFF94A3B8))),
+                title: Text('LOGOUT', style: GoogleFonts.plusJakartaSans(color: AppColors.textOnSurface, fontSize: 20, fontWeight: FontWeight.bold)),
+                content: const Text('Are you sure you want to end your session?', style: TextStyle(color: AppColors.silver500)),
                 actions: [
                   TextButton(
                     onPressed: () => Navigator.pop(context, false),
-                    child: const Text('CANCEL', style: TextStyle(color: Color(0xFF64748B))),
+                    child: const Text('CANCEL', style: TextStyle(color: AppColors.silver500)),
                   ),
                   TextButton(
                     onPressed: () => Navigator.pop(context, true),
@@ -385,7 +385,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   shape: BoxShape.circle,
                                   boxShadow: [
                                     BoxShadow(
-                                      color: Colors.black.withOpacity(0.3),
+                                      color: Colors.black.withValues(alpha: 0.3),
                                       blurRadius: 20,
                                       offset: const Offset(0, 8),
                                     ),
@@ -402,7 +402,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                         )
                                       : null,
                                   child: _isUploading 
-                                    ? const CircularProgressIndicator(color: Colors.white)
+                                    ? const CircularProgressIndicator(color: AppColors.textOnSurface)
                                     : (_profilePicture == null
                                       ? Text(
                                           _name.isNotEmpty ? _name[0].toUpperCase() : 'U',
@@ -424,17 +424,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 child: Container(
                                   padding: const EdgeInsets.all(10),
                                   decoration: BoxDecoration(
-                                    color: Colors.white,
+                                    color: AppColors.textOnSurface,
                                     shape: BoxShape.circle,
                                     boxShadow: [
                                       BoxShadow(
-                                        color: Colors.black.withOpacity(0.3),
+                                        color: Colors.black.withValues(alpha: 0.3),
                                         blurRadius: 8,
                                         offset: const Offset(0, 2),
                                       ),
                                     ],
                                   ),
-                                  child: const Icon(Icons.edit, color: Colors.black, size: 16),
+                                  child: const Icon(Icons.edit, color: AppColors.surface, size: 16),
                                 ),
                               ),
                             ),
@@ -459,7 +459,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       Text(
                         _email,
                         style: const TextStyle(
-                          color: Color(0xFF64748B),
+                          color: AppColors.silver500,
                           fontSize: 14,
                         ),
                       ),
@@ -574,7 +574,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         _buildSectionTitle('MEDICAL HISTORY'),
                         const SizedBox(height: 16),
                         if (_isHistoryLoading)
-                          const Center(child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                          const Center(child: CircularProgressIndicator(color: AppColors.surface, strokeWidth: 2))
                         else if (_medicalHistory.isEmpty)
                           Container(
                             width: double.infinity,
@@ -586,11 +586,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             ),
                             child: Column(
                               children: [
-                                Icon(Icons.history_outlined, size: 32, color: Colors.white.withOpacity(0.1)),
+                                Icon(Icons.history_outlined, size: 32, color: AppColors.textOnSurface.withValues(alpha: 0.1)),
                                 const SizedBox(height: 12),
                                 const Text(
                                   'No past medical history found.',
-                                  style: TextStyle(color: Color(0xFF64748B), fontSize: 13),
+                                  style: TextStyle(color: AppColors.silver500, fontSize: 13),
                                 ),
                               ],
                             ),
@@ -643,7 +643,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       child: Text(
         title,
         style: const TextStyle(
-          color: Color(0xFF64748B),
+          color: AppColors.silver500,
           fontSize: 10,
           fontWeight: FontWeight.bold,
           letterSpacing: 2,
@@ -670,10 +670,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.05),
+              color: AppColors.surfaceLight,
               borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: AppColors.border),
             ),
-            child: Icon(icon, color: AppColors.silver400, size: 20),
+            child: Icon(icon, color: AppColors.textOnSurface, size: 20),
           ),
           const SizedBox(width: 16),
           Expanded(
@@ -683,7 +684,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 Text(
                   title,
                   style: const TextStyle(
-                    color: Color(0xFF64748B),
+                    color: AppColors.silver500,
                     fontSize: 11,
                     fontWeight: FontWeight.w500,
                   ),
@@ -729,9 +730,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: statusColor.withOpacity(0.05),
+        color: statusColor.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: statusColor.withOpacity(0.2)),
+        border: Border.all(color: statusColor.withValues(alpha: 0.2)),
       ),
       child: Row(
         children: [
@@ -755,7 +756,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     child: Text(
                       'Since ${_doctorProfile!['approval_date'].toString().split('T')[0]}',
                       style: const TextStyle(
-                        color: Color(0xFF64748B),
+                        color: AppColors.silver500,
                         fontSize: 12,
                       ),
                     ),
@@ -785,10 +786,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.05),
+                      color: AppColors.surfaceLight,
                       borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: AppColors.border),
                     ),
-                    child: Icon(icon, color: Colors.white, size: 24),
+                    child: Icon(icon, color: AppColors.textOnSurface, size: 24),
                   ),
                   const SizedBox(width: 20),
                   Expanded(
@@ -798,7 +800,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         Text(
                           title,
                           style: const TextStyle(
-                            color: Colors.white,
+                            color: AppColors.textOnSurface,
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
                           ),
@@ -807,20 +809,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         Text(
                           subtitle,
                           style: const TextStyle(
-                            color: Color(0xFF64748B),
+                            color: AppColors.silver500,
                             fontSize: 12,
                           ),
                         ),
                       ],
                     ),
                   ),
-                  Icon(Icons.chevron_right, color: Colors.white.withOpacity(0.2), size: 20),
+                  Icon(Icons.chevron_right, color: AppColors.textOnSurface.withValues(alpha: 0.2), size: 20),
                 ],
               ),
             ),
           ),
-        ),
-      ).animate().fadeIn(duration: 500.ms).slideX(begin: 0.05, end: 0);
+        ).animate().fadeIn(duration: 500.ms).slideX(begin: 0.05, end: 0);
   }
 
   Widget _buildHistoryItem(dynamic history) {
@@ -833,19 +834,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.03),
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white.withOpacity(0.06)),
+        border: Border.all(color: AppColors.border),
       ),
       child: Row(
         children: [
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.05),
+              color: AppColors.surfaceLight,
               shape: BoxShape.circle,
+              border: Border.all(color: AppColors.border),
             ),
-            child: const Icon(Icons.description_outlined, color: Colors.white70, size: 20),
+            child: const Icon(Icons.description_outlined, color: AppColors.textOnSurface, size: 20),
           ),
           const SizedBox(width: 16),
           Expanded(
@@ -857,23 +859,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   children: [
                     Text(
                       doctorName,
-                      style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
+                      style: const TextStyle(color: AppColors.textOnSurface, fontWeight: FontWeight.bold, fontSize: 14),
                     ),
                     Text(
                       date,
-                      style: const TextStyle(color: Color(0xFF64748B), fontSize: 10),
+                      style: const TextStyle(color: AppColors.silver500, fontSize: 10),
                     ),
                   ],
                 ),
                 const SizedBox(height: 4),
                 Text(
                   diagnosis,
-                  style: const TextStyle(color: Colors.white70, fontSize: 12, fontWeight: FontWeight.w500),
+                  style: TextStyle(color: AppColors.textOnSurface.withValues(alpha: 0.7), fontSize: 12, fontWeight: FontWeight.w500),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   notes,
-                  style: const TextStyle(color: Color(0xFF64748B), fontSize: 11),
+                  style: const TextStyle(color: AppColors.silver500, fontSize: 11),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),

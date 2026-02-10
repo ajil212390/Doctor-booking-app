@@ -103,7 +103,7 @@ class _MainScreenState extends State<MainScreen> {
                 width: 120,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: AppColors.border.withOpacity(0.2),
+                  color: AppColors.border.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -124,7 +124,7 @@ class _MainScreenState extends State<MainScreen> {
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.2),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 20,
             offset: const Offset(0, -4),
           ),

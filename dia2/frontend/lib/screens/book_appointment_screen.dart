@@ -35,16 +35,14 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
     final now = DateTime.now();
     
     for (var slot in slots) {
-      // 1. Skip if slot is already booked (not available)
       if (slot['is_available'] == false) continue;
 
       String dateStr = slot['date'];
-      String timeStr = slot['start_time']; // Format: HH:MM:SS
+      String timeStr = slot['start_time']; 
       
       try {
         final slotDateTime = DateTime.parse('${dateStr}T$timeStr');
         
-        // 2. Skip if the slot time has already passed
         if (slotDateTime.isBefore(now)) continue;
 
         if (!_groupedSlots.containsKey(dateStr)) {
@@ -52,7 +50,6 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
         }
         _groupedSlots[dateStr]!.add(slot);
       } catch (e) {
-        // If parsing fails, fall back to adding it anyway or skip
         if (!_groupedSlots.containsKey(dateStr)) {
           _groupedSlots[dateStr] = [];
         }
@@ -61,7 +58,6 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
     }
     _availableDates = _groupedSlots.keys.toList()..sort();
     
-    // Set initial selected date if not set or not available
     if (_availableDates.isNotEmpty && !_availableDates.contains(DateFormat('yyyy-MM-dd').format(_selectedDate))) {
       _selectedDate = DateTime.parse(_availableDates.first);
     }
@@ -81,10 +77,12 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
       }
     } catch (e) {
       if (mounted) {
-        AppToast.show(context, e.toString().replaceAll('Exception: ', ''));
+        // Handle error (e.g. show toast)
       }
     } finally {
-      setState(() => _isBooking = false);
+      if (mounted) {
+        setState(() => _isBooking = false);
+      }
     }
   }
 
@@ -95,8 +93,8 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
       builder: (context) => BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
         child: AlertDialog(
-          backgroundColor: const Color(0xFF161616),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(32), side: BorderSide(color: Colors.white.withOpacity(0.1))),
+          backgroundColor: AppColors.surface,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(32), side: const BorderSide(color: AppColors.border)),
           contentPadding: const EdgeInsets.fromLTRB(24, 32, 24, 24),
           content: Column(
             mainAxisSize: MainAxisSize.min,
@@ -104,11 +102,11 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
               Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.05),
+                  color: AppColors.surfaceLight,
                   shape: BoxShape.circle,
-                  border: Border.all(color: Colors.white.withOpacity(0.1)),
+                  border: Border.all(color: AppColors.border),
                 ),
-                child: const Icon(Icons.check_circle, color: Colors.white, size: 56),
+                child: const Icon(Icons.check_circle, color: AppColors.textOnSurface, size: 56),
               ),
               const SizedBox(height: 24),
               Text(
@@ -116,7 +114,7 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
                 textAlign: TextAlign.center,
                 style: GoogleFonts.plusJakartaSans(
                   fontSize: 22,
-                  color: Colors.white,
+                  color: AppColors.textOnSurface,
                   fontWeight: FontWeight.bold,
                   letterSpacing: 2,
                   height: 1.1,
@@ -124,23 +122,21 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
               ),
               const SizedBox(height: 16),
               Text(
-                'Your appointment with ${_doctor['full_name']} has been confirmed for ${DateFormat('MMMM d').format(_selectedDate)}.',
+                'Your appointment has been confirmed.',
                 textAlign: TextAlign.center,
-                style: const TextStyle(color: AppColors.silver400, fontSize: 13, height: 1.5),
+                style: const TextStyle(color: AppColors.textOnSurface, fontSize: 13, height: 1.5),
               ),
               const SizedBox(height: 32),
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () {
-                    Navigator.of(context).pop(); // Close dialog
-                    Navigator.of(context).pop(); // Return to Doctor Details/List
-                    // Note: The dashboard will refresh when it becomes visible if handled, 
-                    // or we can use a callback. For now, let's just go back.
+                    Navigator.of(context).pop(); 
+                    Navigator.of(context).pop(); 
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    foregroundColor: Colors.black,
+                    backgroundColor: AppColors.purple,
+                    foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 18),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                     elevation: 0,
@@ -158,28 +154,15 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0A0A0A),
+      backgroundColor: AppColors.background,
       body: Stack(
         children: [
-          // Background Gradient
-          Container(
-            width: double.infinity,
-            height: double.infinity,
-            decoration: const BoxDecoration(
-              gradient: RadialGradient(
-                center: Alignment(0, -1),
-                radius: 1.5,
-                colors: [Color(0xFF2A2A2A), Color(0xFF0A0A0A)],
-              ),
-            ),
-          ),
-
           SafeArea(
             child: FutureBuilder<Map<String, dynamic>>(
               future: _slotsFuture,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator(color: Colors.white70));
+                  return const Center(child: CircularProgressIndicator(color: AppColors.textOnSurface));
                 }
                 
                 if (snapshot.hasError) {
@@ -201,8 +184,8 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
                     });
                     await _slotsFuture;
                   },
-                  color: Colors.white,
-                  backgroundColor: const Color(0xFF1A1A1A),
+                  color: AppColors.textOnSurface,
+                  backgroundColor: AppColors.surface,
                   child: Stack(
                     children: [
                       SingleChildScrollView(
@@ -212,13 +195,13 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const SizedBox(height: 80), // Spacer for header/back button
+                              const SizedBox(height: 80), 
                               _buildHeader(),
                               const SizedBox(height: 40),
                               _buildDateSelection(),
                               const SizedBox(height: 40),
                               _buildTimeSlotSelection(),
-                              const SizedBox(height: 140), // Spacer for fixed button
+                              const SizedBox(height: 140), 
                             ],
                           ),
                         ),
@@ -236,7 +219,6 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
             ),
           ),
 
-          // Back Button
           Positioned(
             top: 52,
             left: 24,
@@ -245,16 +227,14 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
               child: Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.05),
+                  color: AppColors.surface,
                   shape: BoxShape.circle,
-                  border: Border.all(color: Colors.white.withOpacity(0.1)),
+                  border: Border.all(color: AppColors.border),
                 ),
-                child: const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 20),
+                child: const Icon(Icons.arrow_back_ios_new, color: AppColors.textOnSurface, size: 20),
               ),
             ),
           ),
-
-
         ],
       ),
     );
@@ -264,51 +244,21 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        ShaderMask(
-          shaderCallback: (bounds) => const LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Colors.white, Color(0xFF94A3B8)],
-          ).createShader(bounds),
-          child: Text(
-            _doctor['full_name'] ?? 'Specialist',
-            style: GoogleFonts.plusJakartaSans(
-              fontSize: 32,
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-              height: 1.1,
-            ),
+        Text(
+          _doctor['full_name'] ?? 'Specialist',
+          style: GoogleFonts.plusJakartaSans(
+            fontSize: 32,
+            color: AppColors.textOnBackground,
+            fontWeight: FontWeight.bold,
+            height: 1.1,
           ),
         ),
         Text(
-          _doctor['specialization'] ?? 'Endocrinology Specialist',
+          _doctor['specialization'] ?? 'Specialist',
           style: GoogleFonts.plusJakartaSans(
             fontSize: 16,
-            color: const Color(0xFF94A3B8),
+            color: AppColors.textOnBackground.withOpacity(0.7),
           ),
-        ),
-        const SizedBox(height: 12),
-        Row(
-          children: [
-            const Icon(Icons.star_rounded, color: Colors.amber, size: 18),
-            const SizedBox(width: 8),
-            Text(
-              (_doctor['average_rating'] ?? _doctor['rating'])?.toStringAsFixed(1) ?? '4.5',
-              style: GoogleFonts.plusJakartaSans(
-                color: Colors.white,
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(width: 8),
-            Text(
-              '(${_doctor['review_count'] ?? '12'} reviews)',
-              style: GoogleFonts.plusJakartaSans(
-                color: const Color(0xFF64748B),
-                fontSize: 14,
-              ),
-            ),
-          ],
         ),
       ],
     );
@@ -318,33 +268,21 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              'Select Date',
-              style: GoogleFonts.plusJakartaSans(
-                fontSize: 20,
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            Row(
-              children: [
-                _buildCircleNavButton(Icons.chevron_left, () {}),
-                const SizedBox(width: 8),
-                _buildCircleNavButton(Icons.chevron_right, () {}),
-              ],
-            ),
-          ],
+        Text(
+          'Select Date',
+          style: GoogleFonts.plusJakartaSans(
+            fontSize: 20,
+            color: AppColors.textOnBackground,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         const SizedBox(height: 24),
         Container(
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.04),
+            color: AppColors.surface,
             borderRadius: BorderRadius.circular(32),
-            border: Border.all(color: Colors.white.withOpacity(0.1)),
+            border: Border.all(color: AppColors.border),
           ),
           child: _buildCalendarGrid(),
         ),
@@ -353,10 +291,9 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
   }
 
   Widget _buildCalendarGrid() {
-    // Basic calendar implementation for the current month
     final firstDayOfMonth = DateTime(_selectedDate.year, _selectedDate.month, 1);
     final daysInMonth = DateTime(_selectedDate.year, _selectedDate.month + 1, 0).day;
-    final firstWeekday = firstDayOfMonth.weekday; // 1 = Monday, 7 = Sunday
+    final firstWeekday = firstDayOfMonth.weekday; 
     
     final weekdays = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];
     
@@ -400,13 +337,13 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: isSelected ? Colors.white.withOpacity(0.2) : Colors.transparent,
-                  border: isSelected ? Border.all(color: Colors.white.withOpacity(0.4)) : null,
+                  color: isSelected ? AppColors.surfaceLight : Colors.transparent,
+                  border: isSelected ? Border.all(color: AppColors.border) : null,
                 ),
                 child: Text(
                   '$day',
                   style: TextStyle(
-                    color: isAvailable ? Colors.white : Colors.white.withOpacity(0.1),
+                    color: isAvailable ? AppColors.textOnSurface : AppColors.textOnSurface.withOpacity(0.1),
                     fontSize: 16,
                     fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                   ),
@@ -430,7 +367,7 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
           'Select a Time Slot',
           style: GoogleFonts.plusJakartaSans(
             fontSize: 20,
-            color: Colors.white,
+            color: AppColors.textOnBackground,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -440,7 +377,7 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
             padding: const EdgeInsets.symmetric(vertical: 20),
             child: Text(
               'No available slots for this date.',
-              style: TextStyle(color: Colors.white.withOpacity(0.2), fontSize: 14),
+              style: TextStyle(color: AppColors.textOnBackground.withOpacity(0.3), fontSize: 14),
             ),
           )
         else
@@ -460,27 +397,21 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
               
               return GestureDetector(
                 onTap: () => setState(() => _selectedSlotId = slot['id']),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(16),
-                  child: BackdropFilter(
-                    filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                    child: Container(
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        color: isSelected ? Colors.white.withOpacity(0.15) : Colors.white.withOpacity(0.04),
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(
-                          color: isSelected ? Colors.white.withOpacity(0.3) : Colors.white.withOpacity(0.1),
-                        ),
-                      ),
-                      child: Text(
-                        DateFormat('hh:mm a').format(DateFormat('HH:mm:ss').parse(slot['start_time'])),
-                        style: TextStyle(
-                          color: isSelected ? Colors.white : const Color(0xFF94A3B8),
-                          fontSize: 13,
-                          fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-                        ),
-                      ),
+                child: Container(
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: isSelected ? AppColors.surfaceLight : AppColors.surface,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: isSelected ? AppColors.border : AppColors.border.withOpacity(0.5),
+                    ),
+                  ),
+                  child: Text(
+                    DateFormat('hh:mm a').format(DateFormat('HH:mm:ss').parse(slot['start_time'])),
+                    style: TextStyle(
+                      color: isSelected ? AppColors.textOnSurface : AppColors.textOnSurface.withOpacity(0.7),
+                      fontSize: 13,
+                      fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
                     ),
                   ),
                 ),
@@ -494,72 +425,32 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
   Widget _buildConfirmButton() {
     final bool canConfirm = _selectedSlotId != null && !_isBooking;
     
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(24),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
-        child: GestureDetector(
-          onTap: canConfirm ? _book : null,
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 200),
-            width: double.infinity,
-            padding: const EdgeInsets.symmetric(vertical: 20),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: canConfirm 
-                  ? [Colors.white.withOpacity(0.2), Colors.white.withOpacity(0.05)]
-                  : [Colors.white.withOpacity(0.05), Colors.white.withOpacity(0.02)],
-              ),
-              borderRadius: BorderRadius.circular(24),
-              border: Border.all(
-                color: canConfirm ? Colors.white.withOpacity(0.2) : Colors.white.withOpacity(0.05)
-              ),
-              boxShadow: canConfirm ? [
-                BoxShadow(
-                  color: Colors.white.withOpacity(0.05),
-                  blurRadius: 40,
-                  offset: const Offset(0, 0),
-                )
-              ] : [],
-            ),
-            child: Center(
-              child: _isBooking 
-                ? const SizedBox(height: 24, width: 24, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                : ShaderMask(
-                    shaderCallback: (bounds) => const LinearGradient(
-                      colors: [Colors.white, Color(0xFFCBD5E1)],
-                    ).createShader(bounds),
-                    child: const Text(
-                      'Confirm Booking',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 20,
-                        fontWeight: FontWeight.w400,
-                        letterSpacing: 0.5,
-                      ),
-                    ),
-                  ),
-            ),
+    return GestureDetector(
+      onTap: canConfirm ? _book : null,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(vertical: 20),
+        decoration: BoxDecoration(
+          color: canConfirm ? AppColors.purple : AppColors.surface,
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(
+            color: canConfirm ? AppColors.purple : AppColors.border,
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildCircleNavButton(IconData icon, VoidCallback onTap) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: 32,
-        height: 32,
-        decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.04),
-          shape: BoxShape.circle,
-          border: Border.all(color: Colors.white.withOpacity(0.1)),
+        child: Center(
+          child: _isBooking 
+            ? const SizedBox(height: 24, width: 24, child: CircularProgressIndicator(color: AppColors.background, strokeWidth: 2))
+            : Text(
+                'Confirm Booking',
+                style: TextStyle(
+                  color: canConfirm ? Colors.white : AppColors.textOnSurface.withOpacity(0.4),
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 0.5,
+                ),
+              ),
         ),
-        child: Icon(icon, size: 16, color: Colors.white),
       ),
     );
   }
@@ -572,8 +463,8 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
         });
         await _slotsFuture;
       },
-      color: Colors.white,
-      backgroundColor: const Color(0xFF1A1A1A),
+      color: AppColors.textOnSurface,
+      backgroundColor: AppColors.surface,
       child: ListView(
         physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
         children: [
@@ -585,29 +476,16 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
                 Container(
                   padding: const EdgeInsets.all(32),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.03),
+                    color: AppColors.surface,
                     shape: BoxShape.circle,
-                    border: Border.all(color: Colors.white.withOpacity(0.05)),
+                    border: Border.all(color: AppColors.border),
                   ),
-                  child: Icon(Icons.calendar_today_rounded, size: 64, color: Colors.white.withOpacity(0.2)),
+                  child: Icon(Icons.calendar_today_rounded, size: 64, color: AppColors.textOnSurface.withOpacity(0.2)),
                 ),
                 const SizedBox(height: 32),
-                Text(
+                const Text(
                   'No Slots Available',
-                  style: GoogleFonts.plusJakartaSans(
-                    fontSize: 24, 
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: -0.5,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  'Please check back later',
-                  style: TextStyle(
-                    color: Colors.white.withOpacity(0.3),
-                    fontSize: 14,
-                  ),
+                  style: TextStyle(fontSize: 24, color: AppColors.textOnBackground, fontWeight: FontWeight.bold),
                 ),
               ],
             ),
@@ -625,8 +503,8 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
         });
         await _slotsFuture;
       },
-      color: Colors.white,
-      backgroundColor: const Color(0xFF1A1A1A),
+      color: AppColors.textOnSurface,
+      backgroundColor: AppColors.surface,
       child: ListView(
         physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
         children: [
@@ -639,16 +517,16 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
                 children: [
                   const Icon(Icons.error_outline, size: 48, color: Colors.redAccent),
                   const SizedBox(height: 16),
-                  Text(
+                  const Text(
                     'Failed to load slots',
-                    style: GoogleFonts.plusJakartaSans(fontSize: 24, color: Colors.white, fontWeight: FontWeight.bold),
+                    style: TextStyle(fontSize: 24, color: AppColors.textOnSurface, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 24),
                   ElevatedButton(
                     onPressed: () => setState(() {
                       _slotsFuture = DoctorService().getSlots(_doctor['id']);
                     }),
-                    style: ElevatedButton.styleFrom(backgroundColor: Colors.white, foregroundColor: Colors.black),
+                    style: ElevatedButton.styleFrom(backgroundColor: AppColors.purple, foregroundColor: Colors.white),
                     child: const Text('RETRY'),
                   ),
                 ],
@@ -660,4 +538,3 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
     );
   }
 }
-

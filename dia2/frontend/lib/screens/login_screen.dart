@@ -81,9 +81,9 @@ class _LoginScreenState extends State<LoginScreen> {
                   Container(
                     padding: const EdgeInsets.all(24),
                     decoration: BoxDecoration(
-                      color: AppColors.cardBackground,
+                      color: AppColors.surface,
                       borderRadius: BorderRadius.circular(32),
-                      border: Border.all(color: AppColors.cardBorder),
+                      border: Border.all(color: AppColors.border),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -103,7 +103,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           style: const TextStyle(color: AppColors.textOnSurface),
                           decoration: InputDecoration(
                             hintText: 'your@email.com',
-                            hintStyle: TextStyle(color: AppColors.textOnSurface.withOpacity(0.3)),
+                            hintStyle: TextStyle(color: AppColors.textOnSurface.withValues(alpha: 0.3)),
                             filled: true,
                             fillColor: AppColors.surfaceLight,
                             border: OutlineInputBorder(
@@ -138,7 +138,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           style: const TextStyle(color: AppColors.textOnSurface),
                           decoration: InputDecoration(
                             hintText: '••••••••',
-                            hintStyle: TextStyle(color: AppColors.textOnSurface.withOpacity(0.3)),
+                            hintStyle: TextStyle(color: AppColors.textOnSurface.withValues(alpha: 0.3)),
                             filled: true,
                             fillColor: AppColors.surfaceLight,
                             border: OutlineInputBorder(
@@ -159,14 +159,14 @@ class _LoginScreenState extends State<LoginScreen> {
                         
                         const SizedBox(height: 32),
                         
-                        _isLoading 
-                          ? const Center(child: CircularProgressIndicator(color: Colors.white))
+                        _isLoading
+                          ? const Center(child: CircularProgressIndicator(color: AppColors.textOnSurface))
                           : SizedBox(
                               width: double.infinity,
                               child: ElevatedButton(
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: AppColors.surface,
-                                  foregroundColor: AppColors.textOnSurface,
+                                  backgroundColor: AppColors.purple,
+                                  foregroundColor: Colors.white,
                                   minimumSize: const Size(double.infinity, 56),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(16),
@@ -196,12 +196,12 @@ class _LoginScreenState extends State<LoginScreen> {
                         children: [
                           const TextSpan(
                             text: "Don't have an account? ",
-                            style: TextStyle(color: AppColors.darkMetallicText), // Adjusted text color
+                            style: TextStyle(color: AppColors.textOnBackground), 
                           ),
                           TextSpan(
                             text: 'Sign Up',
                             style: const TextStyle(
-                              color: AppColors.textOnCreamBackground, // Changed to textOnCreamBackground
+                              color: AppColors.textOnBackground, 
                               fontWeight: FontWeight.bold,
                               decoration: TextDecoration.underline,
                             ),

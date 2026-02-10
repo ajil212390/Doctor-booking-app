@@ -126,12 +126,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: AppColors.background,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
+          icon: const Icon(Icons.arrow_back_ios, color: AppColors.textOnBackground),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -146,16 +146,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  ShaderMask(
-                    shaderCallback: (bounds) => AppColors.silverGradient.createShader(bounds),
-                    child: Text(
-                      _selectedRole == 'DOCTOR' ? 'Doctor Registration' : 'Create Account',
-                      style: TextStyle(
-                        fontSize: 32,
-                        fontWeight: FontWeight.w800,
-                        color: Colors.white,
-                        letterSpacing: -0.5,
-                      ),
+                  Text(
+                    _selectedRole == 'DOCTOR' ? 'Doctor Registration' : 'Create Account',
+                    style: TextStyle(
+                      fontSize: 32,
+                      fontWeight: FontWeight.w800,
+                      color: AppColors.textOnBackground,
+                      letterSpacing: -0.5,
                     ),
                   ).animate().fadeIn(duration: 800.ms).slideX(begin: -0.1, end: 0),
                   
@@ -173,9 +170,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   Container(
                     padding: const EdgeInsets.all(24),
                     decoration: BoxDecoration(
-                      color: AppColors.cardBackground,
+                      color: AppColors.surface,
                       borderRadius: BorderRadius.circular(32),
-                      border: Border.all(color: AppColors.cardBorder),
+                      border: Border.all(color: AppColors.border),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -207,11 +204,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         
                         if (_selectedRole == 'DOCTOR') ...[
                           const SizedBox(height: 32),
-                          const Divider(color: AppColors.cardBorder),
+                          const Divider(color: AppColors.border),
                           const SizedBox(height: 24),
                           const Text(
                             'DOCTOR INFORMATION',
-                            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, letterSpacing: 1),
+                            style: TextStyle(color: AppColors.textOnSurface, fontWeight: FontWeight.bold, letterSpacing: 1),
                           ),
                           const SizedBox(height: 24),
                           
@@ -272,13 +269,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         const SizedBox(height: 32),
                         
                         _isLoading 
-                          ? const Center(child: CircularProgressIndicator(color: Colors.white))
+                          ? const Center(child: CircularProgressIndicator(color: AppColors.textOnSurface))
                           : SizedBox(
                               width: double.infinity,
                               child: ElevatedButton(
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.white,
-                                  foregroundColor: Colors.black,
+                                  backgroundColor: AppColors.purple,
+                                  foregroundColor: Colors.white,
                                   minimumSize: const Size(double.infinity, 56),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(16),
@@ -320,7 +317,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               TextSpan(
                                 text: 'Register as Doctor',
                                 style: GoogleFonts.plusJakartaSans(
-                                  color: Colors.white,
+                                  color: AppColors.textOnBackground,
                                   fontWeight: FontWeight.bold,
                                   decoration: TextDecoration.underline,
                                 ),
@@ -364,16 +361,20 @@ class _RegisterScreenState extends State<RegisterScreen> {
       keyboardType: keyboardType,
       validator: validator,
       maxLines: maxLines,
-      style: const TextStyle(color: Colors.white),
+      style: const TextStyle(color: AppColors.textOnSurface),
       decoration: InputDecoration(
         hintText: hint,
-        hintStyle: TextStyle(color: Colors.white.withOpacity(0.2)),
+        hintStyle: TextStyle(color: AppColors.textOnSurface.withValues(alpha: 0.2)),
         filled: true,
-        fillColor: Colors.white.withOpacity(0.05),
-        prefixIcon: icon != null ? Icon(icon, color: Colors.white.withOpacity(0.5)) : null,
+        fillColor: AppColors.surfaceLight,
+        prefixIcon: icon != null ? Icon(icon, color: AppColors.textOnSurface.withValues(alpha: 0.5)) : null,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide.none,
+          borderSide: const BorderSide(color: AppColors.border),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: const BorderSide(color: AppColors.border),
         ),
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       ),

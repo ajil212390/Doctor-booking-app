@@ -35,70 +35,60 @@ class _DoctorReviewsScreenState extends State<DoctorReviewsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: AppColors.background,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 20),
+          icon: const Icon(Icons.arrow_back_ios_new, color: AppColors.textOnBackground, size: 20),
           onPressed: () => Navigator.pop(context),
         ),
         title: const Text(
           'ALL FEEDBACK',
-          style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold, letterSpacing: 2),
+          style: TextStyle(color: AppColors.textOnBackground, fontSize: 14, fontWeight: FontWeight.bold, letterSpacing: 2),
         ),
         centerTitle: true,
       ),
-      body: Container(
-        height: double.infinity,
-        decoration: const BoxDecoration(
-          gradient: RadialGradient(
-            center: Alignment(0, -1),
-            radius: 1.5,
-            colors: [Color(0xFF1A1A1A), Color(0xFF0A0A0A)],
-          ),
-        ),
-        child: RefreshIndicator(
-          onRefresh: _fetchFeedback,
-          color: Colors.white,
-          backgroundColor: const Color(0xFF1A1A1A),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: 16),
-                if (_isLoading && _feedback.isEmpty)
-                  const Expanded(child: Center(child: CircularProgressIndicator(color: Colors.white)))
-                else if (_feedback.isEmpty)
-                  Expanded(
-                    child: ListView(
-                      physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
-                      children: [
-                        SizedBox(height: MediaQuery.of(context).size.height * 0.3),
-                        Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(Icons.chat_bubble_outline, color: Colors.white.withOpacity(0.1), size: 64),
-                              const SizedBox(height: 16),
-                              const Text('No feedback entries found', style: TextStyle(color: AppColors.silver500)),
-                            ],
-                          ),
+      body: RefreshIndicator(
+        onRefresh: _fetchFeedback,
+        color: AppColors.textOnSurface,
+        backgroundColor: AppColors.surface,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 16),
+              if (_isLoading && _feedback.isEmpty)
+                const Expanded(child: Center(child: CircularProgressIndicator(color: AppColors.textOnSurface)))
+              else if (_feedback.isEmpty)
+                Expanded(
+                  child: ListView(
+                    physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+                    children: [
+                      SizedBox(height: MediaQuery.of(context).size.height * 0.3),
+                      Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.chat_bubble_outline, color: AppColors.textOnSurface.withValues(alpha: 0.1), size: 64),
+                            const SizedBox(height: 16),
+                            const Text('No feedback entries found', style: TextStyle(color: AppColors.silver500)),
+                          ],
                         ),
-                      ],
-                    ),
-                  )
-                else
-                  Expanded(
-                    child: ListView.builder(
-                      physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
-                      itemCount: _feedback.length,
-                      itemBuilder: (context, index) => _buildFeedbackCard(_feedback[index]),
-                    ),
+                      ),
+                    ],
                   ),
-              ],
-            ),
+                )
+              else
+                Expanded(
+                  child: ListView.builder(
+                    physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+                    itemCount: _feedback.length,
+                    itemBuilder: (context, index) => _buildFeedbackCard(_feedback[index]),
+                  ),
+                ),
+            ],
           ),
         ),
       ),
@@ -124,9 +114,16 @@ class _DoctorReviewsScreenState extends State<DoctorReviewsScreen> {
         margin: const EdgeInsets.only(bottom: 16),
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.04),
+          color: AppColors.surface,
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: Colors.white.withOpacity(0.06)),
+          border: Border.all(color: AppColors.border),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.05),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -136,9 +133,9 @@ class _DoctorReviewsScreenState extends State<DoctorReviewsScreen> {
               children: [
                 Text(
                   patientName,
-                  style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold),
+                  style: const TextStyle(color: AppColors.textOnSurface, fontSize: 15, fontWeight: FontWeight.bold),
                 ),
-                Icon(Icons.verified, color: const Color(0xFF10B981).withOpacity(0.5), size: 14),
+                Icon(Icons.verified, color: const Color(0xFF10B981).withValues(alpha: 0.5), size: 14),
               ],
             ),
             const SizedBox(height: 4),
@@ -149,7 +146,7 @@ class _DoctorReviewsScreenState extends State<DoctorReviewsScreen> {
             const SizedBox(height: 16),
             Text(
               comment,
-              style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 14, height: 1.5),
+              style: TextStyle(color: AppColors.textOnSurface.withValues(alpha: 0.8), fontSize: 14, height: 1.5),
             ),
           ],
         ),

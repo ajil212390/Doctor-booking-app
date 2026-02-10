@@ -78,18 +78,9 @@ class _PatientListScreenState extends State<PatientListScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: AppColors.background,
       body: Container(
-        decoration: const BoxDecoration(
-          gradient: RadialGradient(
-            center: Alignment(0, -1),
-            radius: 1.5,
-            colors: [
-              Color(0xFF1A1A1A),
-              Color(0xFF0A0A0A),
-            ],
-          ),
-        ),
+        color: AppColors.background,
         child: SafeArea(
           bottom: false,
           child: Column(
@@ -98,8 +89,8 @@ class _PatientListScreenState extends State<PatientListScreen> {
               Expanded(
                 child: RefreshIndicator(
                   onRefresh: _fetchAppointments,
-                  color: Colors.white,
-                  backgroundColor: const Color(0xFF1A1A1A),
+                  color: AppColors.surface,
+                  backgroundColor: AppColors.background,
                   child: SingleChildScrollView(
                     padding: const EdgeInsets.symmetric(horizontal: 24),
                     physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
@@ -114,14 +105,14 @@ class _PatientListScreenState extends State<PatientListScreen> {
                         if (_isLoading && _appointments.isEmpty)
                           const Center(child: Padding(
                             padding: EdgeInsets.only(top: 100),
-                            child: CircularProgressIndicator(color: Colors.white),
+                            child: CircularProgressIndicator(color: AppColors.surface),
                           ))
                         else if (_filteredAppointments.isEmpty)
                           Center(child: Padding(
                             padding: const EdgeInsets.only(top: 60),
                             child: Column(
                               children: [
-                                Icon(Icons.event_busy_rounded, size: 48, color: Colors.white.withOpacity(0.1)),
+                                Icon(Icons.event_busy_rounded, size: 48, color: AppColors.textOnSurface.withOpacity(0.1)),
                                 const SizedBox(height: 12),
                                 Text(
                                   'No appointments for ${DateFormat('MMM d').format(_selectedDate)}',
@@ -162,24 +153,21 @@ class _PatientListScreenState extends State<PatientListScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const SizedBox(height: 12),
-        ShaderMask(
-          shaderCallback: (bounds) => AppColors.silverGradient.createShader(bounds),
-          child: Text(
-            headerTitle,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 34,
-              fontWeight: FontWeight.w800,
-              height: 1.1,
-              letterSpacing: -1,
-            ),
+        Text(
+          headerTitle,
+          style: const TextStyle(
+            color: AppColors.textOnBackground,
+            fontSize: 34,
+            fontWeight: FontWeight.w800,
+            height: 1.1,
+            letterSpacing: -1,
           ),
         ),
         const SizedBox(height: 12),
         Text(
           dateText,
           style: const TextStyle(
-            color: Color(0xFF94A3B8),
+            color: AppColors.silver500,
             fontSize: 15,
             fontWeight: FontWeight.w500,
           ),
@@ -212,14 +200,14 @@ class _PatientListScreenState extends State<PatientListScreen> {
               margin: const EdgeInsets.only(right: 12),
               decoration: BoxDecoration(
                 color: isSelected 
-                    ? Colors.white.withOpacity(0.15) 
-                    : Colors.white.withOpacity(0.03),
+                    ? AppColors.surface 
+                    : AppColors.surfaceLight,
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
                   color: isSelected 
-                      ? Colors.white.withOpacity(0.3) 
+                      ? AppColors.border 
                       : isToday 
-                          ? Colors.white.withOpacity(0.1)
+                          ? AppColors.border.withValues(alpha: 0.5)
                           : Colors.transparent,
                   width: 1.5,
                 ),
@@ -230,7 +218,7 @@ class _PatientListScreenState extends State<PatientListScreen> {
                   Text(
                     _weekDays[date.weekday % 7],
                     style: TextStyle(
-                      color: isSelected ? Colors.white : AppColors.silver500,
+                      color: isSelected ? AppColors.textOnSurface : AppColors.silver500,
                       fontSize: 10,
                       fontWeight: FontWeight.bold,
                     ),
@@ -239,7 +227,7 @@ class _PatientListScreenState extends State<PatientListScreen> {
                   Text(
                     date.day.toString(),
                     style: TextStyle(
-                      color: Colors.white,
+                      color: AppColors.textOnSurface,
                       fontSize: 18,
                       fontWeight: isSelected ? FontWeight.w800 : FontWeight.w500,
                     ),
@@ -261,7 +249,7 @@ class _PatientListScreenState extends State<PatientListScreen> {
     items.add(
       Text(
         'Showing ${filtered.length} appointments',
-        style: TextStyle(color: Colors.white.withOpacity(0.3), fontSize: 12),
+        style: TextStyle(color: AppColors.textOnBackground.withValues(alpha: 0.3), fontSize: 12),
       ),
     );
     items.add(const SizedBox(height: 16));
@@ -275,7 +263,7 @@ class _PatientListScreenState extends State<PatientListScreen> {
           Container(
             padding: const EdgeInsets.all(16),
             margin: const EdgeInsets.only(bottom: 8),
-            color: Colors.red.withOpacity(0.2),
+            color: Colors.red.withValues(alpha: 0.2),
             child: Text('Error rendering card: $e', style: const TextStyle(color: Colors.red)),
           ),
         );
@@ -327,13 +315,13 @@ class _PatientListScreenState extends State<PatientListScreen> {
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
                     color: isActive 
-                        ? Colors.white.withOpacity(0.12) 
-                        : Colors.white.withOpacity(0.03),
+                        ? AppColors.surface 
+                        : AppColors.surfaceLight,
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
                       color: isActive 
-                          ? Colors.white.withOpacity(0.3) 
-                          : Colors.white.withOpacity(0.05),
+                          ? AppColors.border 
+                          : AppColors.border.withValues(alpha: 0.3),
                       width: 1.5,
                     ),
                   ),
@@ -343,7 +331,7 @@ class _PatientListScreenState extends State<PatientListScreen> {
                       Text(
                         _weekDays[date.weekday % 7],
                         style: TextStyle(
-                          color: isActive ? Colors.white : AppColors.silver400,
+                          color: isActive ? AppColors.textOnSurface : AppColors.silver400,
                           fontSize: 10,
                           fontWeight: FontWeight.bold,
                         ),
@@ -352,7 +340,7 @@ class _PatientListScreenState extends State<PatientListScreen> {
                       Text(
                         date.day.toString(),
                         style: TextStyle(
-                          color: Colors.white,
+                          color: AppColors.textOnSurface,
                           fontSize: 20,
                           fontWeight: isActive ? FontWeight.w800 : FontWeight.w600,
                         ),
@@ -373,9 +361,9 @@ class _PatientListScreenState extends State<PatientListScreen> {
       width: 44,
       height: 44,
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
+        color: AppColors.textOnSurface.withValues(alpha: 0.05),
         shape: BoxShape.circle,
-        border: Border.all(color: Colors.white.withOpacity(0.1)),
+        border: Border.all(color: AppColors.textOnSurface.withValues(alpha: 0.1)),
       ),
       child: Icon(icon, color: AppColors.silver200, size: 20),
     );
@@ -459,9 +447,9 @@ class _PatientListScreenState extends State<PatientListScreen> {
         margin: const EdgeInsets.only(bottom: 16),
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.04), // Cleaner glass effect
+          color: AppColors.surface,
           borderRadius: BorderRadius.circular(28),
-          border: Border.all(color: Colors.white.withOpacity(0.08)),
+          border: Border.all(color: AppColors.border),
         ),
         child: Row(
           children: [
@@ -470,20 +458,20 @@ class _PatientListScreenState extends State<PatientListScreen> {
               width: 72,
               height: 72,
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.06),
+                color: AppColors.surfaceLight,
                 borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: Colors.white.withOpacity(0.1)),
+                border: Border.all(color: AppColors.border),
               ),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
                     fTime,
-                    style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold),
+                    style: const TextStyle(color: AppColors.textOnSurface, fontSize: 13, fontWeight: FontWeight.bold),
                   ),
                   Text(
                     period,
-                    style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 18, fontWeight: FontWeight.w900),
+                    style: TextStyle(color: AppColors.textOnSurface.withValues(alpha: 0.4), fontSize: 18, fontWeight: FontWeight.w900),
                   ),
                 ],
               ),
@@ -500,7 +488,7 @@ class _PatientListScreenState extends State<PatientListScreen> {
                       Expanded(
                         child: Text(
                           patientName,
-                          style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold, letterSpacing: -0.5),
+                          style: const TextStyle(color: AppColors.textOnSurface, fontSize: 18, fontWeight: FontWeight.bold, letterSpacing: -0.5),
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
@@ -513,8 +501,8 @@ class _PatientListScreenState extends State<PatientListScreen> {
                               builder: (context) => BackdropFilter(
                                 filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
                                 child: AlertDialog(
-                                  backgroundColor: const Color(0xFF161616),
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(32), side: BorderSide(color: Colors.white.withOpacity(0.1))),
+                                  backgroundColor: AppColors.surface,
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(32), side: const BorderSide(color: AppColors.border)),
                                   contentPadding: const EdgeInsets.fromLTRB(24, 32, 24, 24),
                                   content: Column(
                                     mainAxisSize: MainAxisSize.min,
@@ -522,7 +510,7 @@ class _PatientListScreenState extends State<PatientListScreen> {
                                       Container(
                                         padding: const EdgeInsets.all(16),
                                         decoration: BoxDecoration(
-                                          color: const Color(0xFF10B981).withOpacity(0.1),
+                                          color: const Color(0xFF10B981).withValues(alpha: 0.1),
                                           shape: BoxShape.circle,
                                         ),
                                         child: const Icon(Icons.check_circle_outline, color: Color(0xFF10B981), size: 40),
@@ -531,13 +519,13 @@ class _PatientListScreenState extends State<PatientListScreen> {
                                       const Text(
                                         'Finish Consultation?',
                                         textAlign: TextAlign.center,
-                                        style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+                                        style: TextStyle(color: AppColors.textOnSurface, fontSize: 20, fontWeight: FontWeight.bold),
                                       ),
                                       const SizedBox(height: 12),
                                       const Text(
                                         'This will mark the session as completed and move it to your records.',
                                         textAlign: TextAlign.center,
-                                        style: TextStyle(color: AppColors.silver400, fontSize: 13, height: 1.5),
+                                        style: TextStyle(color: AppColors.textOnSurface, fontSize: 13, height: 1.5),
                                       ),
                                       const SizedBox(height: 32),
                                       Row(
@@ -592,15 +580,15 @@ class _PatientListScreenState extends State<PatientListScreen> {
                           },
                           child: Container(
                             padding: const EdgeInsets.all(8),
-                            decoration: BoxDecoration(color: const Color(0xFF10B981).withOpacity(0.1), shape: BoxShape.circle),
+                            decoration: BoxDecoration(color: const Color(0xFF10B981).withValues(alpha: 0.1), shape: BoxShape.circle),
                             child: const Icon(Icons.check, color: Color(0xFF10B981), size: 18),
                           ),
                         )
                       else
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                          decoration: BoxDecoration(color: Colors.white.withOpacity(0.1), borderRadius: BorderRadius.circular(10)),
-                          child: const Text('DONE', style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1)),
+                          decoration: BoxDecoration(color: AppColors.surfaceLight, borderRadius: BorderRadius.circular(10), border: Border.all(color: AppColors.border)),
+                          child: const Text('DONE', style: TextStyle(color: AppColors.textOnSurface, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1)),
                         ),
                     ],
                   ),
@@ -610,7 +598,7 @@ class _PatientListScreenState extends State<PatientListScreen> {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                         decoration: BoxDecoration(
-                          color: riskColor.withOpacity(0.1),
+                          color: riskColor.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Text(
@@ -621,7 +609,7 @@ class _PatientListScreenState extends State<PatientListScreen> {
                       const SizedBox(width: 12),
                       Text(
                         'Score: $riskScore',
-                        style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 12, fontWeight: FontWeight.w600),
+                        style: TextStyle(color: AppColors.textOnSurface.withValues(alpha: 0.5), fontSize: 12, fontWeight: FontWeight.w600),
                       ),
                       const SizedBox(width: 12),
                       Container(
@@ -630,7 +618,7 @@ class _PatientListScreenState extends State<PatientListScreen> {
                         decoration: BoxDecoration(
                           color: riskColor,
                           shape: BoxShape.circle,
-                          boxShadow: [BoxShadow(color: riskColor.withOpacity(0.5), blurRadius: 6)],
+                          boxShadow: [BoxShadow(color: riskColor.withValues(alpha: 0.5), blurRadius: 6)],
                         ),
                       ),
                     ],
@@ -638,18 +626,18 @@ class _PatientListScreenState extends State<PatientListScreen> {
                   const SizedBox(height: 12),
                   Row(
                     children: [
-                      Icon(Icons.access_time_filled, color: Colors.white.withOpacity(0.2), size: 14),
+                      Icon(Icons.access_time_filled, color: AppColors.textOnSurface.withValues(alpha: 0.2), size: 14),
                       const SizedBox(width: 6),
                       Text(
                         displayTimeRange,
-                        style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 11, fontWeight: FontWeight.w600),
+                        style: TextStyle(color: AppColors.textOnSurface.withValues(alpha: 0.6), fontSize: 11, fontWeight: FontWeight.w600),
                       ),
                     ],
                   ),
                   const SizedBox(height: 4),
                   Text(
                     description,
-                    style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 13, height: 1.3),
+                    style: TextStyle(color: AppColors.textOnSurface.withValues(alpha: 0.4), fontSize: 13, height: 1.3),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),

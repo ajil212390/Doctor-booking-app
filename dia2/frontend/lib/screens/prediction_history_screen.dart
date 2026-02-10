@@ -29,29 +29,29 @@ class _PredictionHistoryScreenState extends State<PredictionHistoryScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: AppColors.background,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 20),
+          icon: const Icon(Icons.arrow_back_ios_new, color: AppColors.textOnBackground, size: 20),
           onPressed: () => Navigator.pop(context),
         ),
         title: const Text(
           'Prediction History',
-          style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+          style: TextStyle(color: AppColors.textOnBackground, fontSize: 16, fontWeight: FontWeight.bold),
         ),
       ),
       body: RefreshIndicator(
         onRefresh: _refresh,
-        color: Colors.white,
-        backgroundColor: const Color(0xFF1A1A1A),
+        color: AppColors.surface,
+        backgroundColor: AppColors.background,
         child: FutureBuilder<List<dynamic>>(
           future: _historyFuture,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator(color: Colors.white));
+              return const Center(child: CircularProgressIndicator(color: AppColors.surface));
             }
             if (snapshot.hasError) {
               return ListView(
@@ -68,7 +68,7 @@ class _PredictionHistoryScreenState extends State<PredictionHistoryScreen> {
                         const SizedBox(height: 16),
                         ElevatedButton(
                           onPressed: _refresh,
-                          style: ElevatedButton.styleFrom(backgroundColor: Colors.white, foregroundColor: Colors.black),
+                          style: ElevatedButton.styleFrom(backgroundColor: AppColors.purple, foregroundColor: Colors.white),
                           child: const Text('Retry'),
                         ),
                       ],
@@ -88,7 +88,7 @@ class _PredictionHistoryScreenState extends State<PredictionHistoryScreen> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.history_outlined, size: 64, color: Colors.white.withOpacity(0.1)),
+                        Icon(Icons.history_outlined, size: 64, color: AppColors.textOnSurface.withOpacity(0.1)),
                         const SizedBox(height: 16),
                         const Text('No saved predictions found.', style: TextStyle(color: AppColors.silver400, fontSize: 16)),
                       ],
@@ -163,7 +163,7 @@ class _PredictionHistoryScreenState extends State<PredictionHistoryScreen> {
                             const SizedBox(height: 8),
                             Text(
                               'Probability Score: ${(probabilityScore * 100).toStringAsFixed(1)}%',
-                              style: const TextStyle(color: Colors.white70, fontSize: 13),
+                              style: TextStyle(color: AppColors.textOnSurface.withOpacity(0.7), fontSize: 13),
                             ),
                             const SizedBox(height: 12),
                             Row(
@@ -171,13 +171,13 @@ class _PredictionHistoryScreenState extends State<PredictionHistoryScreen> {
                                 Container(
                                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                                   decoration: BoxDecoration(
-                                    color: Colors.white10,
+                                    color: AppColors.surfaceLight,
                                     borderRadius: BorderRadius.circular(20),
-                                    border: Border.all(color: Colors.white.withOpacity(0.1)),
+                                    border: Border.all(color: AppColors.border),
                                   ),
                                   child: Text(
                                     riskLevel,
-                                    style: const TextStyle(fontSize: 10, color: Colors.white, fontWeight: FontWeight.bold),
+                                    style: const TextStyle(fontSize: 10, color: AppColors.textOnSurface, fontWeight: FontWeight.bold),
                                   ),
                                 ),
                               ],

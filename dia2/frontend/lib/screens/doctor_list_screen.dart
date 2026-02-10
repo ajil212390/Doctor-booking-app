@@ -98,7 +98,7 @@ class _DoctorListScreenState extends State<DoctorListScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0A0A0A),
+      backgroundColor: AppColors.background,
       body: Stack(
         children: [
           // Background Gradient
@@ -110,7 +110,7 @@ class _DoctorListScreenState extends State<DoctorListScreen> {
           
           SafeArea(
             child: _isLoading && _doctors.isEmpty
-              ? const Center(child: CircularProgressIndicator(color: AppColors.surface))
+              ? const Center(child: CircularProgressIndicator(color: AppColors.textOnBackground))
               : _error != null && _doctors.isEmpty
                 ? _buildErrorState(_error!)
                 : RefreshIndicator(
@@ -183,9 +183,9 @@ class _DoctorListScreenState extends State<DoctorListScreen> {
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                             decoration: BoxDecoration(
-                              color: const Color(0xFF10B981).withOpacity(0.1),
+                              color: const Color(0xFF10B981).withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(20),
-                              border: Border.all(color: const Color(0xFF10B981).withOpacity(0.2)),
+                              border: Border.all(color: const Color(0xFF10B981).withValues(alpha: 0.2)),
                             ),
                             child: Text(
                               '$count ACTIVE',
@@ -222,13 +222,13 @@ class _DoctorListScreenState extends State<DoctorListScreen> {
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
                     color: _locationEnabled 
-                        ? Colors.greenAccent.withOpacity(0.1) 
-                        : Colors.amber.withOpacity(0.1),
+                        ? Colors.greenAccent.withValues(alpha: 0.1) 
+                        : Colors.amber.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(
                       color: _locationEnabled 
-                          ? Colors.greenAccent.withOpacity(0.3) 
-                          : Colors.amber.withOpacity(0.3),
+                          ? Colors.greenAccent.withValues(alpha: 0.3) 
+                          : Colors.amber.withValues(alpha: 0.3),
                     ),
                   ),
                   child: Row(
@@ -328,7 +328,7 @@ class _DoctorListScreenState extends State<DoctorListScreen> {
             border: Border.all(color: AppColors.border),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.1),
+                color: Colors.black.withValues(alpha: 0.05),
                 blurRadius: 10,
                 offset: const Offset(0, 4),
               ),
@@ -393,7 +393,7 @@ class _DoctorListScreenState extends State<DoctorListScreen> {
                         Text(
                           (doc['average_rating'] ?? doc['rating'])?.toStringAsFixed(1) ?? '4.5',
                           style: GoogleFonts.plusJakartaSans(
-                            color: Colors.white.withOpacity(0.9),
+                            color: AppColors.textOnSurface.withValues(alpha: 0.9),
                             fontSize: 11,
                             fontWeight: FontWeight.bold,
                           ),
@@ -412,13 +412,13 @@ class _DoctorListScreenState extends State<DoctorListScreen> {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                       decoration: BoxDecoration(
-                        color: AppColors.textOnSurface,
+                        color: AppColors.purple,
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: const Text(
                         'BOOK NOW',
                         style: TextStyle(
-                          color: AppColors.surface,
+                          color: Colors.white,
                           fontSize: 9,
                           fontWeight: FontWeight.w900,
                           letterSpacing: 0.5,
@@ -449,13 +449,13 @@ class _DoctorListScreenState extends State<DoctorListScreen> {
                         errorBuilder: (context, error, stackTrace) => Icon(
                           Icons.person,
                           size: 32,
-                          color: Colors.white.withOpacity(0.2),
+                          color: AppColors.textOnSurface.withValues(alpha: 0.2),
                         ),
                       )
                     : Icon(
                         Icons.person,
                         size: 32,
-                        color: Colors.white.withOpacity(0.2),
+                        color: AppColors.textOnSurface.withValues(alpha: 0.2),
                       ),
                 ),
               ),
@@ -471,11 +471,11 @@ class _DoctorListScreenState extends State<DoctorListScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.person_search_outlined, size: 80, color: Colors.white.withOpacity(0.05)),
+          Icon(Icons.person_search_outlined, size: 80, color: AppColors.textOnBackground.withValues(alpha: 0.05)),
           const SizedBox(height: 24),
           Text(
             'No Doctors Available',
-            style: GoogleFonts.plusJakartaSans(fontSize: 24, color: Colors.white.withOpacity(0.5)),
+            style: GoogleFonts.plusJakartaSans(fontSize: 24, color: AppColors.textOnBackground.withValues(alpha: 0.5)),
           ),
         ],
       ),
@@ -493,13 +493,13 @@ class _DoctorListScreenState extends State<DoctorListScreen> {
             const SizedBox(height: 16),
             Text(
               'Failed to load specialists',
-              style: GoogleFonts.plusJakartaSans(fontSize: 24, color: Colors.white, fontWeight: FontWeight.bold),
+              style: GoogleFonts.plusJakartaSans(fontSize: 24, color: AppColors.textOnBackground, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
             Text(
               error,
               textAlign: TextAlign.center,
-              style: const TextStyle(color: Colors.white38, fontSize: 14),
+              style: TextStyle(color: AppColors.textOnBackground.withValues(alpha: 0.5), fontSize: 14),
             ),
             const SizedBox(height: 24),
             ElevatedButton(

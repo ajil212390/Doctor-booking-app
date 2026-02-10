@@ -186,15 +186,15 @@ class HomeDashboardState extends State<HomeDashboard> {
                   TextField(
                     controller: reviewController,
                     maxLines: 3,
-                    style: const TextStyle(color: Colors.white, fontSize: 14),
+                    style: const TextStyle(color: AppColors.textOnSurface, fontSize: 14),
                     decoration: InputDecoration(
                       hintText: 'Enter your feedback here...',
-                      hintStyle: TextStyle(color: Colors.white.withOpacity(0.2)),
+                      hintStyle: TextStyle(color: AppColors.textOnSurface.withOpacity(0.2)),
                       filled: true,
-                      fillColor: Colors.white.withOpacity(0.05),
+                      fillColor: AppColors.surfaceLight,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
-                        borderSide: BorderSide(color: Colors.white.withOpacity(0.1)),
+                        borderSide: BorderSide(color: AppColors.border.withOpacity(0.5)),
                       ),
                     ),
                   ),
@@ -234,7 +234,7 @@ class HomeDashboardState extends State<HomeDashboard> {
                     }
                   }
                 },
-                child: const Text('SUBMIT', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                child: const Text('SUBMIT', style: TextStyle(color: AppColors.purple, fontWeight: FontWeight.bold)),
               ),
             ],
         ),
@@ -288,7 +288,7 @@ class HomeDashboardState extends State<HomeDashboard> {
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: AppColors.surface,
-        title: const Text('Logout', style: TextStyle(color: Colors.white)),
+        title: const Text('Logout', style: TextStyle(color: AppColors.textOnSurface)),
         content: const Text('Are you sure you want to sign out?', style: TextStyle(color: AppColors.silver400)),
         actions: [
           TextButton(
@@ -323,7 +323,7 @@ class HomeDashboardState extends State<HomeDashboard> {
           title: Text(
             'RISK ANALYSIS',
             style: GoogleFonts.plusJakartaSans(
-              color: Colors.white,
+              color: AppColors.textOnSurface,
               fontWeight: FontWeight.bold,
               fontSize: 18,
             ),
@@ -331,7 +331,7 @@ class HomeDashboardState extends State<HomeDashboard> {
           content: Text(
             'This health score is calculated using our AI model based on your clinical data, including glucose levels, HbA1c, and other health markers. It provides an estimate of your diabetes risk level.',
             style: GoogleFonts.plusJakartaSans(
-              color: AppColors.silver400,
+              color: AppColors.textOnSurface.withValues(alpha: 0.7),
               fontSize: 14,
               height: 1.5,
             ),
@@ -339,11 +339,10 @@ class HomeDashboardState extends State<HomeDashboard> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('GOT IT', style: TextStyle(color: Colors.white)),
+              child: const Text('GOT IT', style: TextStyle(color: AppColors.textOnSurface)),
             ),
           ],
         ),
-      ),
     );
   }
 
@@ -433,7 +432,7 @@ class HomeDashboardState extends State<HomeDashboard> {
               border: Border.all(color: AppColors.border, width: 2),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
+                  color: Colors.black.withValues(alpha: 0.05),
                   blurRadius: 10,
                   offset: const Offset(0, 4),
                 ),
@@ -442,7 +441,7 @@ class HomeDashboardState extends State<HomeDashboard> {
             alignment: Alignment.center,
             child: Icon(
               Icons.person,
-              color: Colors.white.withOpacity(0.2),
+              color: AppColors.textOnSurface.withValues(alpha: 0.2),
               size: 24,
             ),
           ),
@@ -490,7 +489,7 @@ class HomeDashboardState extends State<HomeDashboard> {
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.1),
+                      color: AppColors.surfaceLight,
                       shape: BoxShape.circle,
                     ),
                     child: const Icon(Icons.analytics_outlined, color: AppColors.silver300, size: 18),
@@ -504,36 +503,31 @@ class HomeDashboardState extends State<HomeDashboard> {
                   width: double.infinity,
                   padding: const EdgeInsets.symmetric(vertical: 20),
                   decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        Colors.white.withOpacity(0.15),
-                        Colors.white.withOpacity(0.05),
-                      ],
-                    ),
+                    color: AppColors.surfaceLight,
                     borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: Colors.white.withOpacity(0.1)),
+                    border: Border.all(color: AppColors.border),
                   ),
                   child: Column(
                     children: [
                       Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: AppColors.purple,
                           shape: BoxShape.circle,
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.white.withOpacity(0.3),
+                              color: AppColors.purple.withValues(alpha: 0.3),
                               blurRadius: 15,
                             )
                           ]
                         ),
-                        child: const Icon(Icons.add, color: AppColors.textOnSurface, size: 24),
+                        child: const Icon(Icons.add, color: Colors.white, size: 24),
                       ),
                       const SizedBox(height: 16),
                       Text(
                         'TAKE YOUR FIRST TEST',
                         style: GoogleFonts.plusJakartaSans(
-                          color: Colors.white,
+                          color: AppColors.purple,
                           fontSize: 11,
                           fontWeight: FontWeight.bold,
                           letterSpacing: 2,
@@ -556,7 +550,7 @@ class HomeDashboardState extends State<HomeDashboard> {
                       Text(
                         'Risk Assessment',
                         style: GoogleFonts.plusJakartaSans(
-                          color: Colors.white,
+                          color: AppColors.textOnSurface,
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
                           letterSpacing: -0.5,
@@ -577,11 +571,11 @@ class HomeDashboardState extends State<HomeDashboard> {
                     child: Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.1),
+                        color: AppColors.surfaceLight,
                         shape: BoxShape.circle,
-                        border: Border.all(color: Colors.white.withOpacity(0.1)),
+                        border: Border.all(color: AppColors.border),
                       ),
-                      child: const Icon(Icons.info_outline, color: AppColors.silver300, size: 18),
+                      child: const Icon(Icons.info_outline, color: AppColors.textOnSurface, size: 18),
                     ),
                   ),
                 ],
@@ -640,7 +634,7 @@ class HomeDashboardState extends State<HomeDashboard> {
                       const SizedBox(height: 16),
                       _buildScoreRow('LAST UPDATE', 
                           _formatLastUpdate(_latestPrediction!['created_at']), 
-                          AppColors.silver400.withOpacity(0.4)),
+                          AppColors.silver400),
                     ],
                   ),
                 ],
@@ -720,7 +714,7 @@ class HomeDashboardState extends State<HomeDashboard> {
           children: [
             Row(
               children: [
-                const Icon(Icons.event_note_outlined, color: Colors.white, size: 22),
+                const Icon(Icons.event_note_outlined, color: AppColors.textOnBackground, size: 22),
                 const SizedBox(width: 12),
                 Text(
                   'My Appointments',
@@ -749,7 +743,7 @@ class HomeDashboardState extends State<HomeDashboard> {
         ),
         const SizedBox(height: 16),
         if (_isAppointmentsLoading)
-          const Center(child: CircularProgressIndicator(color: Colors.white24))
+          const Center(child: CircularProgressIndicator(color: AppColors.textOnBackground))
         else if (_appointments.isEmpty)
           Container(
             padding: const EdgeInsets.all(24),
@@ -760,7 +754,7 @@ class HomeDashboardState extends State<HomeDashboard> {
             ),
             child: Row(
               children: [
-                Icon(Icons.event_available, color: Colors.white.withOpacity(0.2), size: 24),
+                Icon(Icons.event_available, color: AppColors.textOnSurface.withValues(alpha: 0.2), size: 24),
                 const SizedBox(width: 16),
                 const Text('No bookings yet', style: TextStyle(color: AppColors.silver500)),
               ],
@@ -798,9 +792,9 @@ class HomeDashboardState extends State<HomeDashboard> {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: AppColors.cardBackground,
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: AppColors.cardBorder),
+        border: Border.all(color: AppColors.border),
       ),
       child: Column(
         children: [
@@ -810,17 +804,17 @@ class HomeDashboardState extends State<HomeDashboard> {
                 width: 48,
                 height: 48,
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.05),
+                  color: AppColors.surfaceLight,
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.person_outline, color: Colors.white70),
+                child: const Icon(Icons.person_outline, color: AppColors.textOnSurface),
               ),
               const SizedBox(width: 16),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(doctorName, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+                    Text(doctorName, style: const TextStyle(color: AppColors.textOnSurface, fontWeight: FontWeight.bold, fontSize: 16)),
                     const SizedBox(height: 4),
                     Text(
                       '${apt['date'] ?? apt['slot_details']?['date'] ?? 'Today'} • ${apt['start_time'] ?? apt['slot_details']?['start_time'] ?? 'Fixed'}',
@@ -834,15 +828,15 @@ class HomeDashboardState extends State<HomeDashboard> {
           ),
           if (showFeedbackButton || hasReview) ...[
             const SizedBox(height: 16),
-            const Divider(color: Colors.white10),
+            const Divider(color: AppColors.border),
             const SizedBox(height: 8),
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: hasReview ? null : () => _showReviewDialog(apt),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: hasReview ? Colors.white10 : Colors.white,
-                  foregroundColor: hasReview ? Colors.white24 : Colors.black,
+                  backgroundColor: hasReview ? AppColors.surfaceLight : AppColors.purple,
+                  foregroundColor: hasReview ? AppColors.textOnSurface.withValues(alpha: 0.2) : Colors.white,
                   elevation: 0,
                   padding: const EdgeInsets.symmetric(vertical: 12),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -874,9 +868,9 @@ class HomeDashboardState extends State<HomeDashboard> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: color.withOpacity(0.2)),
+        border: Border.all(color: color.withValues(alpha: 0.2)),
       ),
       child: Text(
         status,
@@ -905,7 +899,7 @@ class StarRating extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 2),
             child: Icon(
               index < rating ? Icons.star : Icons.star_border,
-              color: index < rating ? Colors.amber : Colors.white24,
+              color: index < rating ? Colors.amber : AppColors.textOnSurface.withValues(alpha: 0.1),
               size: 32,
             ),
           ),

@@ -14,6 +14,22 @@ class AppColors {
   static const Color darkMetallicText = Color(0xFF2C2C2C);
   static const Color black = Color(0xFF121212);
 
+  // Purple accent for CTA buttons and highlights inside dark containers
+  static const Color purple = Color(0xFFC084FC);       // Main purple accent
+  static const Color purpleLight = Color(0xFFD8B4FE);   // Lighter purple
+  static const Color purpleDark = Color(0xFFA855F7);     // Deeper purple
+  static const Color purpleBg = Color(0x1AC084FC);       // Subtle purple bg (10% opacity)
+
+  static const LinearGradient purpleGradient = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [
+      Color(0xFFA855F7),
+      Color(0xFFC084FC),
+      Color(0xFFD8B4FE),
+    ],
+  );
+
   static const LinearGradient metallicGradient = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
@@ -58,7 +74,6 @@ class AppTheme {
         secondary: AppColors.surfaceLight,
         surface: AppColors.surface,
         onSurface: AppColors.textOnSurface,
-        onBackground: AppColors.textOnBackground,
       ),
       textTheme: GoogleFonts.plusJakartaSansTextTheme().copyWith(
         displayLarge: GoogleFonts.plusJakartaSans(
@@ -117,10 +132,10 @@ class AppToast {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               decoration: BoxDecoration(
-                color: isError ? const Color(0xFF1E1E1E) : Colors.white,
+                color: isError ? const Color(0xFF1E1E1E) : AppColors.background,
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
-                  color: isError ? Colors.redAccent.withOpacity(0.5) : Colors.black12,
+                  color: isError ? Colors.redAccent.withOpacity(0.5) : AppColors.border.withOpacity(0.3),
                   width: 1,
                 ),
                 boxShadow: [
@@ -136,12 +151,12 @@ class AppToast {
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: isError ? Colors.redAccent.withOpacity(0.1) : Colors.black.withOpacity(0.05),
+                      color: isError ? Colors.redAccent.withOpacity(0.1) : AppColors.purple.withOpacity(0.15),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
                       isError ? Icons.error_outline : Icons.check_circle_outline,
-                      color: isError ? Colors.redAccent : Colors.black,
+                      color: isError ? Colors.redAccent : AppColors.purple,
                       size: 20,
                     ),
                   ),
@@ -150,7 +165,7 @@ class AppToast {
                     child: Text(
                       message,
                       style: TextStyle(
-                        color: isError ? Colors.white : Colors.black,
+                        color: isError ? AppColors.textOnSurface : AppColors.textOnBackground,
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
                       ),

@@ -27,7 +27,7 @@ class PredictionResultScreen extends StatelessWidget {
 
     return Scaffold(
       extendBodyBehindAppBar: true,
-      backgroundColor: const Color(0xFF0A0A0A),
+      backgroundColor: AppColors.background,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -36,17 +36,17 @@ class PredictionResultScreen extends StatelessWidget {
           onTap: () => Navigator.pop(context),
           child: Container(
             margin: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.05),
+            decoration: const BoxDecoration(
+              color: AppColors.surface,
               shape: BoxShape.circle,
             ),
-            child: const Icon(Icons.chevron_left, color: Colors.white, size: 24),
+            child: const Icon(Icons.chevron_left, color: AppColors.textOnSurface, size: 24),
           ),
         ),
         title: Text(
           'ASSESSMENT RESULT',
           style: GoogleFonts.plusJakartaSans(
-            color: Colors.white, 
+            color: AppColors.textOnBackground, 
             fontSize: 14, 
             fontWeight: FontWeight.bold, 
             letterSpacing: 2
@@ -59,16 +59,7 @@ class PredictionResultScreen extends StatelessWidget {
           Container(
             width: double.infinity,
             height: double.infinity,
-            decoration: const BoxDecoration(
-              gradient: RadialGradient(
-                center: Alignment(0, -1),
-                radius: 1.5,
-                colors: [
-                  Color(0xFF2A2A2A),
-                  Color(0xFF0A0A0A),
-                ],
-              ),
-            ),
+            color: AppColors.background,
           ),
           
           SingleChildScrollView(
@@ -78,19 +69,19 @@ class PredictionResultScreen extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.05),
+                    color: AppColors.surface,
                     borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: Colors.white.withOpacity(0.05)),
+                    border: Border.all(color: AppColors.border),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(Icons.calendar_today, size: 14, color: Colors.white.withOpacity(0.6)),
+                      Icon(Icons.calendar_today, size: 14, color: AppColors.textOnSurface.withValues(alpha: 0.6)),
                       const SizedBox(width: 8),
                       Text(
                         formattedDate,
                         style: GoogleFonts.plusJakartaSans(
-                          color: Colors.white.withOpacity(0.8),
+                          color: AppColors.textOnSurface,
                           fontSize: 12,
                           fontWeight: FontWeight.w500,
                         ),
@@ -120,9 +111,9 @@ class PredictionResultScreen extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(32),
       decoration: BoxDecoration(
-        color: AppColors.cardBackground,
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(40),
-        border: Border.all(color: AppColors.cardBorder),
+        border: Border.all(color: AppColors.border),
       ),
       child: Column(
         children: [
@@ -141,22 +132,19 @@ class PredictionResultScreen extends StatelessWidget {
                   bottom: 20,
                   child: Column(
                     children: [
-                      ShaderMask(
-                        shaderCallback: (bounds) => AppColors.silverGradient.createShader(bounds),
-                        child: Text(
-                          riskLevel.toUpperCase(),
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 24,
-                            fontWeight: FontWeight.w300,
-                            letterSpacing: -0.5,
-                          ),
+                      Text(
+                        riskLevel.toUpperCase(),
+                        style: const TextStyle(
+                          color: AppColors.textOnSurface,
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: -0.5,
                         ),
                       ),
                       Text(
                         'RISK PROFILE',
                         style: TextStyle(
-                          color: Colors.white.withOpacity(0.2),
+                          color: AppColors.textOnSurface.withValues(alpha: 0.2),
                           fontSize: 9,
                           fontWeight: FontWeight.bold,
                           letterSpacing: 2,
@@ -173,14 +161,14 @@ class PredictionResultScreen extends StatelessWidget {
           Container(
             height: 2,
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.05),
+              color: AppColors.textOnSurface.withValues(alpha: 0.05),
               borderRadius: BorderRadius.circular(1),
             ),
             child: Row(
               children: [
-                Expanded(child: Container(color: Colors.white.withOpacity(score > 33 ? 0.3 : 0.05))),
-                Expanded(child: Container(color: Colors.white.withOpacity(score > 66 ? 0.6 : 0.05))),
-                Expanded(child: Container(color: Colors.white.withOpacity(score > 90 ? 1.0 : 0.05))),
+                Expanded(child: Container(color: AppColors.textOnSurface.withValues(alpha: score > 33 ? 0.3 : 0.05))),
+                Expanded(child: Container(color: AppColors.textOnSurface.withValues(alpha: score > 66 ? 0.6 : 0.05))),
+                Expanded(child: Container(color: AppColors.textOnSurface.withValues(alpha: score > 90 ? 1.0 : 0.05))),
               ],
             ),
           ),
@@ -205,7 +193,7 @@ class PredictionResultScreen extends StatelessWidget {
     return Text(
       text,
       style: TextStyle(
-        color: active ? Colors.white : Colors.white.withOpacity(0.2),
+        color: active ? AppColors.textOnSurface : AppColors.textOnSurface.withValues(alpha: 0.2),
         fontSize: 9,
         fontWeight: FontWeight.bold,
         letterSpacing: 1,
@@ -242,9 +230,9 @@ class PredictionResultScreen extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.cardBackground,
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: AppColors.cardBorder),
+        border: Border.all(color: AppColors.border),
       ),
       child: Row(
         children: [
@@ -252,9 +240,9 @@ class PredictionResultScreen extends StatelessWidget {
             width: 44,
             height: 44,
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.05),
+              color: AppColors.surfaceLight,
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.white.withOpacity(0.1)),
+              border: Border.all(color: AppColors.border),
             ),
             child: Icon(icon, color: AppColors.silver300, size: 20),
           ),
@@ -263,12 +251,12 @@ class PredictionResultScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-                Text(subtitle, style: TextStyle(color: Colors.white.withOpacity(0.3), fontSize: 11)),
+                Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: AppColors.textOnSurface)),
+                Text(subtitle, style: TextStyle(color: AppColors.textOnSurface.withValues(alpha: 0.3), fontSize: 11)),
               ],
             ),
           ),
-          Icon(Icons.info_outline, color: Colors.white.withOpacity(0.2), size: 14),
+          Icon(Icons.info_outline, color: AppColors.textOnSurface.withValues(alpha: 0.2), size: 14),
         ],
       ),
     );
@@ -285,13 +273,9 @@ class PredictionResultScreen extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [Colors.white.withOpacity(0.05), Colors.black],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(30),
-        border: Border.all(color: Colors.white.withOpacity(0.05)),
+        border: Border.all(color: AppColors.border),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -299,9 +283,9 @@ class PredictionResultScreen extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.05),
+              color: AppColors.surfaceLight,
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: Colors.white.withOpacity(0.1)),
+              border: Border.all(color: AppColors.border),
             ),
             child: const Icon(Icons.lightbulb_outline, color: AppColors.silver300, size: 18),
           ),
@@ -310,11 +294,11 @@ class PredictionResultScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('Professional Insight', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                const Text('Professional Insight', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: AppColors.textOnSurface)),
                 const SizedBox(height: 4),
                 Text(
                   insight,
-                  style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 12, height: 1.5),
+                  style: TextStyle(color: AppColors.textOnSurface.withValues(alpha: 0.4), fontSize: 12, height: 1.5),
                 ),
               ],
             ),
@@ -337,7 +321,7 @@ class PredictionResultScreen extends StatelessWidget {
           child: Text(
             'RETURN HOME',
             style: TextStyle(
-              color: Colors.white.withOpacity(0.4),
+              color: AppColors.textOnBackground.withValues(alpha: 0.4),
               fontSize: 10,
               fontWeight: FontWeight.bold,
               letterSpacing: 1,
@@ -361,7 +345,7 @@ class GaugePainter extends CustomPainter {
 
     // Background track
     final bgPaint = Paint()
-      ..color = Colors.white.withOpacity(0.05)
+      ..color = AppColors.border
       ..style = PaintingStyle.stroke
       ..strokeWidth = 12
       ..strokeCap = StrokeCap.round;
@@ -383,9 +367,9 @@ class GaugePainter extends CustomPainter {
     // Gradient for progress
     progressPaint.shader = SweepGradient(
       colors: [
-        Colors.white.withOpacity(0.3),
-        Colors.white.withOpacity(0.8),
-        Colors.white,
+        AppColors.textOnSurface.withValues(alpha: 0.3),
+        AppColors.textOnSurface.withValues(alpha: 0.8),
+        AppColors.textOnSurface,
       ],
       startAngle: math.pi,
       endAngle: 2 * math.pi,

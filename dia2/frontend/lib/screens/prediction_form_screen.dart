@@ -63,15 +63,15 @@ class _PredictionFormScreenState extends State<PredictionFormScreen> {
       builder: (context) => BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
         child: AlertDialog(
-          backgroundColor: const Color(0xFF111111),
+          backgroundColor: AppColors.surface,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(24),
-            side: BorderSide(color: Colors.white.withOpacity(0.1)),
+            side: const BorderSide(color: AppColors.border),
           ),
           title: Text(
             'RISK ASSESSMENT',
             style: GoogleFonts.plusJakartaSans(
-              color: Colors.white,
+              color: AppColors.textOnSurface,
               fontWeight: FontWeight.bold,
               fontSize: 18,
             ),
@@ -87,7 +87,7 @@ class _PredictionFormScreenState extends State<PredictionFormScreen> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('GOT IT', style: TextStyle(color: Colors.white)),
+              child: const Text('GOT IT', style: TextStyle(color: AppColors.textOnSurface)),
             ),
           ],
         ),
@@ -99,23 +99,14 @@ class _PredictionFormScreenState extends State<PredictionFormScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       extendBodyBehindAppBar: true,
-      backgroundColor: const Color(0xFF0A0A0A),
+      backgroundColor: AppColors.background,
       body: Stack(
         children: [
           // Background Gradient
           Container(
             width: double.infinity,
             height: double.infinity,
-            decoration: const BoxDecoration(
-              gradient: RadialGradient(
-                center: Alignment(0, -0.8),
-                radius: 1.5,
-                colors: [
-                  Color(0xFF2A2A2A),
-                  Color(0xFF0A0A0A),
-                ],
-              ),
-            ),
+            color: AppColors.background,
           ),
           
           SafeArea(
@@ -127,16 +118,13 @@ class _PredictionFormScreenState extends State<PredictionFormScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const SizedBox(height: 10), // Minimal spacer since SafeArea handles the top
-                    ShaderMask(
-                      shaderCallback: (bounds) => AppColors.silverGradient.createShader(bounds),
-                      child: Text(
-                        'Clinical Data',
-                        style: GoogleFonts.plusJakartaSans(
-                          fontSize: 28, 
-                          fontWeight: FontWeight.bold, 
-                          color: Colors.white,
-                          letterSpacing: -1,
-                        ),
+                    Text(
+                      'Clinical Data',
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 28, 
+                        fontWeight: FontWeight.bold, 
+                        color: AppColors.textOnBackground,
+                        letterSpacing: -1,
                       ),
                     ).animate().fadeIn().slideX(begin: -0.1, end: 0),
                     const SizedBox(height: 8),
@@ -226,18 +214,17 @@ class _PredictionFormScreenState extends State<PredictionFormScreen> {
               const SizedBox(height: 48),
               
               _isLoading 
-                ? const Center(child: CircularProgressIndicator(color: Colors.white))
+                ? const Center(child: CircularProgressIndicator(color: AppColors.surface))
                 : SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
                       onPressed: _submit,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        foregroundColor: Colors.black,
+                        backgroundColor: AppColors.purple,
+                        foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(vertical: 22),
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-                        elevation: 10,
-                        shadowColor: Colors.white.withOpacity(0.2),
+                        elevation: 4,
                       ),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -280,25 +267,24 @@ class _PredictionFormScreenState extends State<PredictionFormScreen> {
       controller: controller,
       keyboardType: keyboardType,
       validator: (v) => v!.isEmpty ? 'Required' : null,
-      style: const TextStyle(color: Colors.white, fontSize: 14),
+      style: const TextStyle(color: AppColors.textOnSurface, fontSize: 14),
       decoration: InputDecoration(
-        hintText: hint,
-        hintStyle: TextStyle(color: Colors.white.withOpacity(0.2)),
+        hintStyle: TextStyle(color: AppColors.textOnSurface.withValues(alpha: 0.2)),
         suffixText: suffix,
         suffixStyle: const TextStyle(color: AppColors.silver500, fontSize: 12),
         filled: true,
-        fillColor: Colors.white.withOpacity(0.05),
+        fillColor: AppColors.surfaceLight,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide(color: Colors.white.withOpacity(0.1)),
+          borderSide: BorderSide(color: AppColors.border),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide(color: Colors.white.withOpacity(0.1)),
+          borderSide: BorderSide(color: AppColors.border),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: Colors.white),
+          borderSide: const BorderSide(color: AppColors.border, width: 2),
         ),
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       ),
@@ -309,37 +295,38 @@ class _PredictionFormScreenState extends State<PredictionFormScreen> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.cardBackground,
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: AppColors.cardBorder),
+        border: Border.all(color: AppColors.border),
       ),
       child: Row(
         children: [
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.1),
+              color: AppColors.surfaceLight,
               borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: AppColors.border),
             ),
-            child: Icon(icon, color: AppColors.silver200, size: 20),
+            child: Icon(icon, color: AppColors.textOnSurface, size: 20),
           ),
           const SizedBox(width: 16),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
-                Text(subtitle, style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 11)),
+                Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: AppColors.textOnSurface)),
+                Text(subtitle, style: TextStyle(color: AppColors.textOnSurface.withValues(alpha: 0.4), fontSize: 11)),
               ],
             ),
           ),
           Switch(
             value: value,
             onChanged: onChanged,
-            activeColor: Colors.white,
+            activeColor: AppColors.textOnSurface,
             activeTrackColor: AppColors.silver400,
-            inactiveThumbColor: Colors.white60,
-            inactiveTrackColor: Colors.white.withOpacity(0.1),
+            inactiveThumbColor: AppColors.textOnSurface.withValues(alpha: 0.6),
+            inactiveTrackColor: AppColors.border,
           ),
         ],
       ),
@@ -350,15 +337,16 @@ class _PredictionFormScreenState extends State<PredictionFormScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
+        color: AppColors.surfaceLight,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withOpacity(0.1)),
+        border: Border.all(color: AppColors.border),
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<String>(
           value: _gender,
           isExpanded: true,
-          dropdownColor: const Color(0xFF111111),
+          dropdownColor: AppColors.surface,
+          style: const TextStyle(color: AppColors.textOnSurface),
           items: const [
             DropdownMenuItem(value: 'Male', child: Text('Male')),
             DropdownMenuItem(value: 'Female', child: Text('Female')),
@@ -374,15 +362,16 @@ class _PredictionFormScreenState extends State<PredictionFormScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
+        color: AppColors.surfaceLight,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withOpacity(0.1)),
+        border: Border.all(color: AppColors.border),
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<String>(
           value: _smokingHistory,
           isExpanded: true,
-          dropdownColor: const Color(0xFF111111),
+          dropdownColor: AppColors.surface,
+          style: const TextStyle(color: AppColors.textOnSurface),
           items: const [
             DropdownMenuItem(value: 'never', child: Text('Never')),
             DropdownMenuItem(value: 'former', child: Text('Former')),

@@ -19,29 +19,10 @@ class AppointmentDetailsScreen extends StatelessWidget {
     final time = slot['start_time'] ?? appointment['start_time'] ?? 'Scheduled';
 
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: AppColors.background,
       body: Stack(
         children: [
-          // Background Glow
-          Positioned(
-            top: -100,
-            right: -100,
-            child: Container(
-              width: 300,
-              height: 300,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.white.withOpacity(0.03),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.white.withOpacity(0.05),
-                    blurRadius: 100,
-                    spreadRadius: 50,
-                  ),
-                ],
-              ),
-            ),
-          ),
+
           
           SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
@@ -72,12 +53,15 @@ class AppointmentDetailsScreen extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 20),
-          onPressed: () => Navigator.pop(context),
-          style: IconButton.styleFrom(
-            backgroundColor: Colors.white.withOpacity(0.05),
+        GestureDetector(
+          onTap: () => Navigator.pop(context),
+          child: Container(
             padding: const EdgeInsets.all(12),
+            decoration: const BoxDecoration(
+              color: AppColors.surface,
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(Icons.chevron_left, color: AppColors.textOnSurface, size: 24),
           ),
         ),
         Text(
@@ -101,14 +85,14 @@ class AppointmentDetailsScreen extends StatelessWidget {
           padding: const EdgeInsets.all(4),
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            border: Border.all(color: Colors.white.withOpacity(0.05)),
+            border: Border.all(color: AppColors.border),
           ),
           child: CircleAvatar(
             radius: 56,
-            backgroundColor: const Color(0xFF1A1A1A),
+            backgroundColor: AppColors.surface,
             child: Icon(
               Icons.person,
-              color: Colors.white.withOpacity(0.1),
+              color: AppColors.textOnSurface.withValues(alpha: 0.1),
               size: 56,
             ),
           ),
@@ -117,7 +101,7 @@ class AppointmentDetailsScreen extends StatelessWidget {
         Text(
           name,
           style: GoogleFonts.plusJakartaSans(
-            color: Colors.white,
+            color: AppColors.textOnBackground,
             fontSize: 28,
             fontWeight: FontWeight.bold,
             letterSpacing: -1,
@@ -137,9 +121,9 @@ class AppointmentDetailsScreen extends StatelessWidget {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.04),
+            color: AppColors.surface,
             borderRadius: BorderRadius.circular(24),
-            border: Border.all(color: Colors.white.withOpacity(0.08)),
+            border: Border.all(color: AppColors.border),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
@@ -149,7 +133,7 @@ class AppointmentDetailsScreen extends StatelessWidget {
                 height: 24,
                 width: 1,
                 margin: const EdgeInsets.symmetric(horizontal: 20),
-                color: Colors.white.withOpacity(0.1),
+                color: AppColors.border,
               ),
               _buildInfoItem(Icons.access_time, time),
             ],
@@ -167,7 +151,7 @@ class AppointmentDetailsScreen extends StatelessWidget {
         Text(
           text,
           style: const TextStyle(
-            color: Colors.white,
+            color: AppColors.textOnSurface,
             fontSize: 14,
             fontWeight: FontWeight.bold,
           ),
@@ -193,11 +177,11 @@ class AppointmentDetailsScreen extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.03),
+            color: AppColors.surface,
             shape: BoxShape.circle,
-            border: Border.all(color: Colors.white.withOpacity(0.05)),
+            border: Border.all(color: AppColors.border),
           ),
-          child: Icon(icon, color: Colors.white, size: 24),
+          child: Icon(icon, color: AppColors.textOnSurface, size: 24),
         ),
         const SizedBox(height: 12),
         Text(
@@ -214,7 +198,7 @@ class AppointmentDetailsScreen extends StatelessWidget {
       children: [
         const Text(
           'APPOINTMENT STATUS',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14, letterSpacing: 1.5),
+          style: TextStyle(color: AppColors.textOnBackground, fontWeight: FontWeight.bold, fontSize: 14, letterSpacing: 1.5),
         ),
         const SizedBox(height: 24),
         _buildChecklistItem('Booking Confirmed', 'Completed', true),
@@ -231,7 +215,7 @@ class AppointmentDetailsScreen extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: completed ? const Color(0xFF10B981).withOpacity(0.1) : Colors.white.withOpacity(0.03),
+              color: completed ? const Color(0xFF10B981).withValues(alpha: 0.1) : AppColors.textOnBackground.withValues(alpha: 0.03),
               shape: BoxShape.circle,
             ),
             child: Icon(
@@ -245,7 +229,7 @@ class AppointmentDetailsScreen extends StatelessWidget {
             child: Text(
               title,
               style: TextStyle(
-                color: completed ? Colors.white : AppColors.silver500,
+                color: completed ? AppColors.textOnBackground : AppColors.silver500,
                 fontSize: 15,
                 fontWeight: completed ? FontWeight.bold : FontWeight.w500,
               ),
@@ -276,15 +260,15 @@ class AppointmentDetailsScreen extends StatelessWidget {
       children: [
         const Text(
           'HEALTH ANALYSIS',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14, letterSpacing: 1.5),
+          style: TextStyle(color: AppColors.textOnBackground, fontWeight: FontWeight.bold, fontSize: 14, letterSpacing: 1.5),
         ),
         const SizedBox(height: 16),
         Container(
           padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
-            color: AppColors.cardBackground,
+            color: AppColors.surface,
             borderRadius: BorderRadius.circular(32),
-            border: Border.all(color: AppColors.cardBorder),
+            border: Border.all(color: AppColors.border),
           ),
           child: Column(
             children: [
@@ -301,13 +285,13 @@ class AppointmentDetailsScreen extends StatelessWidget {
                       const SizedBox(height: 8),
                       Text(
                         'Score: $riskScore',
-                        style: GoogleFonts.plusJakartaSans(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 24),
+                        style: GoogleFonts.plusJakartaSans(color: AppColors.textOnSurface, fontWeight: FontWeight.bold, fontSize: 24),
                       ),
                     ],
                   ),
                   Container(
                     padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(color: riskColor.withOpacity(0.1), shape: BoxShape.circle),
+                    decoration: BoxDecoration(color: riskColor.withValues(alpha: 0.1), shape: BoxShape.circle),
                     child: Icon(Icons.analytics_outlined, color: riskColor, size: 28),
                   ),
                 ],
@@ -317,7 +301,7 @@ class AppointmentDetailsScreen extends StatelessWidget {
                 borderRadius: BorderRadius.circular(6),
                 child: LinearProgressIndicator(
                   value: 0.75,
-                  backgroundColor: Colors.white.withOpacity(0.05),
+                  backgroundColor: AppColors.textOnBackground.withValues(alpha: 0.05),
                   color: riskColor,
                   minHeight: 8,
                 ),
@@ -338,16 +322,16 @@ class AppointmentDetailsScreen extends StatelessWidget {
       children: [
         Text(
           isActualFeedback ? 'PATIENT FEEDBACK' : 'CONSULTATION NOTES',
-          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14, letterSpacing: 1.5),
+          style: const TextStyle(color: AppColors.textOnBackground, fontWeight: FontWeight.bold, fontSize: 14, letterSpacing: 1.5),
         ),
         const SizedBox(height: 16),
         Container(
           width: double.infinity,
           padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.02),
+            color: AppColors.surface,
             borderRadius: BorderRadius.circular(32),
-            border: Border.all(color: Colors.white.withOpacity(0.05)),
+            border: Border.all(color: AppColors.border),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -383,7 +367,7 @@ class AppointmentDetailsScreen extends StatelessWidget {
               const SizedBox(height: 14),
               Text(
                 feedback,
-                style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 14, height: 1.6),
+                style: TextStyle(color: AppColors.textOnSurface.withValues(alpha: 0.5), fontSize: 14, height: 1.6),
               ),
             ],
           ),
@@ -403,7 +387,7 @@ class AppointmentDetailsScreen extends StatelessWidget {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [Colors.black.withOpacity(0), Colors.black.withOpacity(0.9), Colors.black],
+            colors: [AppColors.background.withValues(alpha: 0), AppColors.background.withValues(alpha: 0.9), AppColors.background],
           ),
         ),
         child: Row(
@@ -412,8 +396,8 @@ class AppointmentDetailsScreen extends StatelessWidget {
               child: ElevatedButton(
                 onPressed: () => Navigator.pop(context),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.white,
-                  foregroundColor: Colors.black,
+                  backgroundColor: AppColors.surface,
+                  foregroundColor: AppColors.textOnSurface,
                   padding: const EdgeInsets.symmetric(vertical: 20),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                   elevation: 0,

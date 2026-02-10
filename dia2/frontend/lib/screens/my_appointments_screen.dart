@@ -49,33 +49,33 @@ class _MyAppointmentsScreenState extends State<MyAppointmentsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: AppColors.background,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 20),
+          icon: const Icon(Icons.arrow_back_ios_new, color: AppColors.textOnBackground, size: 20),
           onPressed: () => Navigator.pop(context),
         ),
         title: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.bookmark_added_outlined, color: Colors.white.withOpacity(0.5), size: 18),
+            Icon(Icons.bookmark_added_outlined, color: AppColors.textOnBackground.withValues(alpha: 0.5), size: 18),
             const SizedBox(width: 8),
             const Text(
               'Bookings',
-              style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+              style: TextStyle(color: AppColors.textOnBackground, fontSize: 16, fontWeight: FontWeight.bold),
             ),
           ],
         ),
       ),
       body: RefreshIndicator(
         onRefresh: _fetchAppointments,
-        color: Colors.white,
-        backgroundColor: const Color(0xFF1A1A1A),
+        color: AppColors.surface,
+        backgroundColor: AppColors.background,
         child: _isLoading && _appointments.isEmpty
-          ? const Center(child: CircularProgressIndicator(color: Colors.white))
+          ? const Center(child: CircularProgressIndicator(color: AppColors.surface))
           : _appointments.isEmpty
             ? ListView(
                 physics: const AlwaysScrollableScrollPhysics(),
@@ -85,7 +85,7 @@ class _MyAppointmentsScreenState extends State<MyAppointmentsScreen> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.event_busy, size: 64, color: Colors.white.withOpacity(0.1)),
+                        Icon(Icons.event_busy, size: 64, color: AppColors.textOnSurface.withValues(alpha: 0.1)),
                         const SizedBox(height: 16),
                         const Text('No appointments found.', style: TextStyle(color: AppColors.silver400, fontSize: 16)),
                       ],
@@ -114,9 +114,9 @@ class _MyAppointmentsScreenState extends State<MyAppointmentsScreen> {
                     margin: const EdgeInsets.only(bottom: 16),
                     padding: const EdgeInsets.all(24),
                     decoration: BoxDecoration(
-                      color: AppColors.cardBackground,
+                      color: AppColors.surface,
                       borderRadius: BorderRadius.circular(32),
-                      border: Border.all(color: AppColors.cardBorder),
+                      border: Border.all(color: AppColors.border),
                     ),
                     child: Row(
                       children: [
@@ -127,9 +127,9 @@ class _MyAppointmentsScreenState extends State<MyAppointmentsScreen> {
                               Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                                 decoration: BoxDecoration(
-                                  color: Colors.white.withOpacity(0.05),
+                                  color: AppColors.surfaceLight,
                                   borderRadius: BorderRadius.circular(20),
-                                  border: Border.all(color: Colors.white.withOpacity(0.1)),
+                                  border: Border.all(color: AppColors.border),
                                 ),
                                 child: Row(
                                   mainAxisSize: MainAxisSize.min,
@@ -143,7 +143,7 @@ class _MyAppointmentsScreenState extends State<MyAppointmentsScreen> {
                               const SizedBox(height: 16),
                               Text(
                                 name ?? 'Unknown',
-                                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.white),
+                                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: AppColors.textOnSurface),
                               ),
                               Text(
                                 isDoctor ? 'Patient' : 'Specialist',
@@ -153,9 +153,9 @@ class _MyAppointmentsScreenState extends State<MyAppointmentsScreen> {
                               Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                                 decoration: BoxDecoration(
-                                  color: _getStatusColor(status).withOpacity(0.1),
+                                  color: _getStatusColor(status).withValues(alpha: 0.1),
                                   borderRadius: BorderRadius.circular(20),
-                                  border: Border.all(color: _getStatusColor(status).withOpacity(0.2)),
+                                  border: Border.all(color: _getStatusColor(status).withValues(alpha: 0.2)),
                                 ),
                                 child: Text(
                                   status.toUpperCase(),
@@ -174,14 +174,14 @@ class _MyAppointmentsScreenState extends State<MyAppointmentsScreen> {
                           width: 70,
                           height: 70,
                           decoration: BoxDecoration(
-                            color: Colors.white10,
+                            color: AppColors.surfaceLight,
                             borderRadius: BorderRadius.circular(20),
-                            border: Border.all(color: Colors.white.withOpacity(0.1)),
+                            border: Border.all(color: AppColors.border),
                           ),
                           child: Center(
                             child: Text(
                               name != null && name.isNotEmpty ? name[0].toUpperCase() : '?',
-                              style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
+                              style: const TextStyle(color: AppColors.textOnSurface, fontSize: 24, fontWeight: FontWeight.bold),
                             ),
                           ),
                         ),

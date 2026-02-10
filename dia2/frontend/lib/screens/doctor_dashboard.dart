@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'dart:ui';
 import 'package:intl/intl.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -152,12 +151,13 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.background,
       body: SafeArea(
         bottom: false,
         child: RefreshIndicator(
           onRefresh: _handleRefresh,
-          color: AppColors.surface,
-          backgroundColor: AppColors.background,
+          color: AppColors.textOnSurface,
+          backgroundColor: AppColors.surface,
             child: SingleChildScrollView(
               physics: const AlwaysScrollableScrollPhysics(),
               padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -214,10 +214,11 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
           height: 48,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            border: Border.all(color: AppColors.surface.withOpacity(0.1), width: 1),
+            color: AppColors.surface,
+            border: Border.all(color: AppColors.border, width: 1),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.1),
+                color: Colors.black.withValues(alpha: 0.1),
                 blurRadius: 10,
                 spreadRadius: 2,
               ),
@@ -233,10 +234,10 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
                   fit: BoxFit.cover,
                   errorBuilder: (context, error, stackTrace) => Container(
                     alignment: Alignment.center,
-                    color: const Color(0xFF1A1A1A),
+                    color: AppColors.surfaceLight,
                     child: Icon(
                       Icons.person,
-                      color: Colors.white.withOpacity(0.2),
+                      color: AppColors.textOnSurface.withValues(alpha: 0.2),
                       size: 24,
                     ),
                   ),
@@ -244,11 +245,11 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
               : Container(
                   alignment: Alignment.center,
                   decoration: const BoxDecoration(
-                    color: Color(0xFF1A1A1A),
+                    color: AppColors.surfaceLight,
                   ),
                   child: Icon(
                     Icons.person,
-                    color: Colors.white.withOpacity(0.2),
+                    color: AppColors.textOnSurface.withValues(alpha: 0.2),
                     size: 24,
                   ),
                 ),
@@ -291,7 +292,7 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
         border: Border.all(color: AppColors.border),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.2),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 15,
             offset: const Offset(0, 8),
           ),
@@ -343,7 +344,7 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
               padding: const EdgeInsets.symmetric(vertical: 20),
               child: Column(
                 children: [
-                  Icon(Icons.event_available_outlined, color: AppColors.silver500.withOpacity(0.5), size: 48),
+                  Icon(Icons.event_available_outlined, color: AppColors.silver500.withValues(alpha: 0.5), size: 48),
                   const SizedBox(height: 12),
                   const Text(
                     'No appointments today',
@@ -479,7 +480,7 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
         border: Border.all(color: AppColors.border),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.3),
+            color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -535,7 +536,7 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
         ),
         const SizedBox(height: 16),
         if (_isLoadingFeedback)
-          const Center(child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+          const Center(child: CircularProgressIndicator(color: AppColors.textOnSurface, strokeWidth: 2))
         else if (_feedback.isEmpty)
           Container(
             width: double.infinity,
@@ -547,7 +548,7 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
           ),
             child: Column(
               children: [
-                Icon(Icons.chat_bubble_outline, color: Colors.white.withOpacity(0.1), size: 32),
+                Icon(Icons.chat_bubble_outline, color: AppColors.textOnSurface.withValues(alpha: 0.1), size: 32),
                 const SizedBox(height: 12),
                 const Text(
                   'No feedback yet',
@@ -586,7 +587,7 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
           border: Border.all(color: AppColors.border),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.1),
+              color: Colors.black.withValues(alpha: 0.05),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -608,7 +609,7 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
                     final rating = (f['rating'] as num?)?.toDouble() ?? 5.0;
                     return Icon(
                       index < rating ? Icons.star : Icons.star_border,
-                      color: index < rating ? Colors.amber : Colors.white10,
+                      color: index < rating ? Colors.amber : AppColors.textOnSurface.withValues(alpha: 0.1),
                       size: 10,
                     );
                   }),
@@ -618,12 +619,12 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
             const SizedBox(height: 2),
             Text(
               dateStr,
-              style: TextStyle(color: AppColors.silver500.withOpacity(0.7), fontSize: 9),
+              style: TextStyle(color: AppColors.silver500.withValues(alpha: 0.7), fontSize: 9),
             ),
             const SizedBox(height: 8),
             Text(
               comment,
-              style: TextStyle(color: AppColors.textOnSurface.withOpacity(0.8), fontSize: 12, height: 1.4),
+              style: TextStyle(color: AppColors.textOnSurface.withValues(alpha: 0.8), fontSize: 12, height: 1.4),
             ),
           ],
         ),

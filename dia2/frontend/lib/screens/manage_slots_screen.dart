@@ -185,8 +185,8 @@ class _ManageSlotsScreenState extends State<ManageSlotsScreen> {
         _fetchSlots(); // Refresh list from backend
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Slot saved to cloud!', style: TextStyle(color: Colors.white)),
-            backgroundColor: Color(0xFF10B981),
+            content: Text('Slot saved to cloud!', style: TextStyle(color: AppColors.background)),
+            backgroundColor: AppColors.textOnSurface,
             behavior: SnackBarBehavior.floating,
           ),
         );
@@ -200,7 +200,7 @@ class _ManageSlotsScreenState extends State<ManageSlotsScreen> {
           
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Failed: $errorMsg', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+          content: Text('Failed: $errorMsg', style: const TextStyle(color: AppColors.surface, fontWeight: FontWeight.bold)),
           backgroundColor: Colors.red.shade800,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -237,8 +237,8 @@ class _ManageSlotsScreenState extends State<ManageSlotsScreen> {
       if (response.statusCode == 204 || response.statusCode == 200 || response.statusCode == 201) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Slot removed from cloud'),
-            backgroundColor: Color(0xFF10B981),
+            content: Text('Slot removed from cloud', style: TextStyle(color: AppColors.background)),
+            backgroundColor: AppColors.textOnSurface,
             duration: Duration(seconds: 1),
           ),
         );
@@ -255,10 +255,10 @@ class _ManageSlotsScreenState extends State<ManageSlotsScreen> {
         return Theme(
           data: ThemeData.dark().copyWith(
             colorScheme: const ColorScheme.dark(
-              primary: Colors.white,
-              onPrimary: Colors.black,
-              surface: Color(0xFF1A1A1A),
-              onSurface: Colors.white,
+              primary: AppColors.surface,
+              onPrimary: AppColors.textOnSurface,
+              surface: AppColors.background,
+              onSurface: AppColors.textOnBackground,
             ),
           ),
           child: child!,
@@ -294,7 +294,7 @@ class _ManageSlotsScreenState extends State<ManageSlotsScreen> {
   void _handleAddSlot() {
     showModalBottomSheet(
       context: context,
-      backgroundColor: const Color(0xFF0A0A0A),
+      backgroundColor: AppColors.background,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
@@ -314,12 +314,12 @@ class _ManageSlotsScreenState extends State<ManageSlotsScreen> {
               children: [
                 const Text(
                   'Add New Slot',
-                  style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+                  style: TextStyle(color: AppColors.textOnBackground, fontSize: 20, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 24),
                 const Text('DATE', style: TextStyle(color: AppColors.silver500, fontSize: 10, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 8),
-                Text('${selectedDate.day} ${_getMonth(selectedDate.month)} ${selectedDate.year}', style: const TextStyle(color: Colors.white, fontSize: 16)),
+                Text('${selectedDate.day} ${_getMonth(selectedDate.month)} ${selectedDate.year}', style: const TextStyle(color: AppColors.textOnBackground, fontSize: 16)),
                 const SizedBox(height: 24),
                 Row(
                   children: [
@@ -350,13 +350,13 @@ class _ManageSlotsScreenState extends State<ManageSlotsScreen> {
                   child: ElevatedButton(
                     onPressed: _isLoading ? null : () => _saveNewSlot(onUpdate: setModalState),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.white,
-                      foregroundColor: Colors.black,
+                      backgroundColor: AppColors.textOnSurface,
+                      foregroundColor: AppColors.background,
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     ),
                     child: _isLoading 
-                      ? const SizedBox(height: 18, width: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.black))
+                      ? const SizedBox(height: 18, width: 18, child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.background))
                       : const Text('SAVE SLOT', style: TextStyle(fontWeight: FontWeight.bold)),
                   ),
                 ),
@@ -372,18 +372,9 @@ class _ManageSlotsScreenState extends State<ManageSlotsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: AppColors.background,
       body: Container(
-        decoration: const BoxDecoration(
-          gradient: RadialGradient(
-            center: Alignment(0, -1),
-            radius: 1.5,
-            colors: [
-              Color(0xFF1A1A1A),
-              Color(0xFF0A0A0A),
-            ],
-          ),
-        ),
+        color: AppColors.background,
         child: SafeArea(
           bottom: false,
           child: Column(
@@ -392,8 +383,8 @@ class _ManageSlotsScreenState extends State<ManageSlotsScreen> {
               Expanded(
                 child: RefreshIndicator(
                   onRefresh: _fetchSlots,
-                  color: Colors.white,
-                  backgroundColor: const Color(0xFF1A1A1A),
+                  color: AppColors.surface,
+                  backgroundColor: AppColors.background,
                   child: SingleChildScrollView(
                     padding: const EdgeInsets.symmetric(horizontal: 24),
                     physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
@@ -412,12 +403,12 @@ class _ManageSlotsScreenState extends State<ManageSlotsScreen> {
                         if (_isLoading && _slots.isEmpty)
                           const Center(child: Padding(
                             padding: EdgeInsets.all(40.0),
-                            child: CircularProgressIndicator(color: Colors.white),
+                            child: CircularProgressIndicator(color: AppColors.surface),
                           ))
                         else if (_slots.where((slot) => slot['date'] == '${selectedDate.year}-${selectedDate.month.toString().padLeft(2, '0')}-${selectedDate.day.toString().padLeft(2, '0')}').isEmpty)
                           const Center(child: Padding(
                             padding: EdgeInsets.all(40.0),
-                            child: Text('No slots for this date', style: TextStyle(color: Color(0xFF94A3B8))),
+                            child: Text('No slots for this date', style: TextStyle(color: AppColors.silver500)),
                           ))
                         else
                           Column(
@@ -440,7 +431,7 @@ class _ManageSlotsScreenState extends State<ManageSlotsScreen> {
                                 return [
                                   const Center(child: Padding(
                                     padding: EdgeInsets.all(40.0),
-                                    child: Text('No upcoming slots for this date', style: TextStyle(color: Color(0xFF94A3B8))),
+                                    child: Text('No upcoming slots for this date', style: TextStyle(color: AppColors.silver500)),
                                   ))
                                 ];
                               }
@@ -493,24 +484,21 @@ class _ManageSlotsScreenState extends State<ManageSlotsScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        ShaderMask(
-          shaderCallback: (bounds) => AppColors.silverGradient.createShader(bounds),
-          child: const Text(
-            'Working\nAvailability',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 34,
-              fontWeight: FontWeight.w800,
-              height: 1.1,
-              letterSpacing: -1,
-            ),
+        const Text(
+          'Working\nAvailability',
+          style: TextStyle(
+            color: AppColors.textOnBackground,
+            fontSize: 34,
+            fontWeight: FontWeight.w800,
+            height: 1.1,
+            letterSpacing: -1,
           ),
         ),
         const SizedBox(height: 12),
         const Text(
           'Precision clinical scheduling',
           style: TextStyle(
-            color: Color(0xFF94A3B8), // Brighter silver/grey
+            color: AppColors.silver500,
             fontSize: 15,
             fontWeight: FontWeight.w500,
           ),
@@ -529,7 +517,7 @@ class _ManageSlotsScreenState extends State<ManageSlotsScreen> {
             const Text(
               'SELECT MONTH',
               style: TextStyle(
-                color: Color(0xFF94A3B8),
+                color: AppColors.silver500,
                 fontSize: 10,
                 fontWeight: FontWeight.bold,
                 letterSpacing: 1.5,
@@ -539,7 +527,7 @@ class _ManageSlotsScreenState extends State<ManageSlotsScreen> {
             Text(
               _getMonth(_viewDate.month) + ' ' + _viewDate.year.toString(),
               style: const TextStyle(
-                color: Colors.white,
+                color: AppColors.textOnBackground,
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
               ),
@@ -550,11 +538,11 @@ class _ManageSlotsScreenState extends State<ManageSlotsScreen> {
           children: [
             IconButton(
               onPressed: () => _changeMonth(-1),
-              icon: const Icon(Icons.keyboard_arrow_left_rounded, color: Colors.white, size: 24),
+              icon: const Icon(Icons.keyboard_arrow_left_rounded, color: AppColors.textOnBackground, size: 24),
             ),
             IconButton(
               onPressed: () => _changeMonth(1),
-              icon: const Icon(Icons.keyboard_arrow_right_rounded, color: Colors.white, size: 24),
+              icon: const Icon(Icons.keyboard_arrow_right_rounded, color: AppColors.textOnBackground, size: 24),
             ),
           ],
         ),
@@ -569,7 +557,7 @@ class _ManageSlotsScreenState extends State<ManageSlotsScreen> {
         const Text(
           'SELECT DATE',
           style: TextStyle(
-            color: Color(0xFF94A3B8),
+            color: AppColors.silver500,
             fontSize: 10,
             fontWeight: FontWeight.bold,
             letterSpacing: 1.5,
@@ -601,13 +589,13 @@ class _ManageSlotsScreenState extends State<ManageSlotsScreen> {
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
                     color: isActive 
-                        ? Colors.white.withOpacity(0.12) 
-                        : (isPast ? Colors.transparent : Colors.white.withOpacity(0.03)),
+                        ? AppColors.surface 
+                        : (isPast ? Colors.transparent : AppColors.surfaceLight),
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
                       color: isActive 
-                          ? Colors.white.withOpacity(0.3) 
-                          : (isPast ? Colors.white.withOpacity(0.02) : Colors.white.withOpacity(0.05)),
+                          ? AppColors.border 
+                          : (isPast ? AppColors.border.withValues(alpha: 0.02) : AppColors.border.withValues(alpha: 0.3)),
                       width: 1.5,
                     ),
                   ),
@@ -618,8 +606,8 @@ class _ManageSlotsScreenState extends State<ManageSlotsScreen> {
                         weekDays[date.weekday % 7],
                         style: TextStyle(
                           color: isPast 
-                              ? Colors.white.withOpacity(0.1) 
-                              : (isActive ? Colors.white : const Color(0xFF94A3B8)),
+                              ? AppColors.textOnSurface.withValues(alpha: 0.1) 
+                              : (isActive ? AppColors.textOnSurface : AppColors.silver500),
                           fontSize: 10,
                           fontWeight: FontWeight.bold,
                         ),
@@ -628,7 +616,7 @@ class _ManageSlotsScreenState extends State<ManageSlotsScreen> {
                       Text(
                         date.day.toString(),
                         style: TextStyle(
-                          color: isPast ? Colors.white.withOpacity(0.1) : Colors.white,
+                          color: isPast ? AppColors.textOnSurface.withValues(alpha: 0.1) : AppColors.textOnSurface,
                           fontSize: 20,
                           fontWeight: isActive ? FontWeight.w800 : FontWeight.w600,
                         ),
@@ -662,17 +650,17 @@ class _ManageSlotsScreenState extends State<ManageSlotsScreen> {
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.08),
+              color: AppColors.surface,
               borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: Colors.white.withOpacity(0.1)),
+              border: Border.all(color: AppColors.border),
             ),
             child: const Row(
               children: [
-                Icon(Icons.add, color: Colors.white, size: 16),
+                Icon(Icons.add, color: AppColors.textOnSurface, size: 16),
                 SizedBox(width: 6),
                 Text(
                   'Add Slot',
-                  style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
+                  style: TextStyle(color: AppColors.textOnSurface, fontSize: 12, fontWeight: FontWeight.bold),
                 ),
               ],
             ),
@@ -693,9 +681,9 @@ class _ManageSlotsScreenState extends State<ManageSlotsScreen> {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: const Color(0xFF1E1E1E), // Slightly lighter than black for contrast
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white.withOpacity(0.1)),
+        border: Border.all(color: AppColors.border),
       ),
       child: Column(
         children: [
@@ -707,7 +695,7 @@ class _ManageSlotsScreenState extends State<ManageSlotsScreen> {
                   Text(
                     'Session $id',
                     style: const TextStyle(
-                      color: Colors.white,
+                      color: AppColors.textOnSurface,
                       fontSize: 15, // Slightly larger
                       fontWeight: FontWeight.bold,
                     ),
@@ -716,14 +704,14 @@ class _ManageSlotsScreenState extends State<ManageSlotsScreen> {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                     decoration: BoxDecoration(
-                      color: accentColor.withOpacity(0.1),
+                      color: accentColor.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(4),
-                      border: Border.all(color: accentColor.withOpacity(0.2)),
+                      border: Border.all(color: accentColor.withValues(alpha: 0.2)),
                     ),
                     child: Text(
                       label,
                       style: const TextStyle(
-                        color: Colors.white,
+                        color: AppColors.textOnSurface,
                         fontSize: 10,
                         fontWeight: FontWeight.w900,
                       ),
@@ -759,7 +747,7 @@ class _ManageSlotsScreenState extends State<ManageSlotsScreen> {
         Text(
           label.toUpperCase(),
           style: const TextStyle(
-            color: Color(0xFF94A3B8), // Brighter label
+            color: AppColors.silver500,
             fontSize: 11,
             fontWeight: FontWeight.bold,
             letterSpacing: 1,
@@ -769,9 +757,9 @@ class _ManageSlotsScreenState extends State<ManageSlotsScreen> {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.02),
+            color: AppColors.surfaceLight,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.white.withOpacity(0.05)),
+            border: Border.all(color: AppColors.border),
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -779,7 +767,7 @@ class _ManageSlotsScreenState extends State<ManageSlotsScreen> {
               Text(
                 time,
                 style: const TextStyle(
-                  color: Colors.white,
+                  color: AppColors.textOnSurface,
                   fontSize: 17, // Larger time text
                   fontWeight: FontWeight.bold,
                 ),
