@@ -105,27 +105,18 @@ class _DoctorListScreenState extends State<DoctorListScreen> {
           Container(
             width: double.infinity,
             height: double.infinity,
-            decoration: const BoxDecoration(
-              gradient: RadialGradient(
-                center: Alignment(0, -1),
-                radius: 1.5,
-                colors: [
-                  Color(0xFF2A2A2A),
-                  Color(0xFF0A0A0A),
-                ],
-              ),
-            ),
+            color: AppColors.background,
           ),
           
           SafeArea(
             child: _isLoading && _doctors.isEmpty
-              ? const Center(child: CircularProgressIndicator(color: Colors.white70))
+              ? const Center(child: CircularProgressIndicator(color: AppColors.surface))
               : _error != null && _doctors.isEmpty
                 ? _buildErrorState(_error!)
                 : RefreshIndicator(
                     onRefresh: _loadDoctors,
-                    color: Colors.white,
-                    backgroundColor: const Color(0xFF1A1A1A),
+                    color: AppColors.surface,
+                    backgroundColor: AppColors.background,
                     child: CustomScrollView(
                       physics: const AlwaysScrollableScrollPhysics(),
                       slivers: [
@@ -175,19 +166,16 @@ class _DoctorListScreenState extends State<DoctorListScreen> {
                     children: [
                       Padding(
                         padding: const EdgeInsets.only(left: 2),
-                        child: ShaderMask(
-                          shaderCallback: (bounds) => AppColors.silverGradient.createShader(bounds),
                           child: Text(
                             'Medical\nSpecialists',
                             style: GoogleFonts.plusJakartaSans(
                               fontSize: 32,
                               fontWeight: FontWeight.bold,
-                              color: Colors.white,
+                              color: AppColors.textOnBackground,
                               height: 1.1,
                               letterSpacing: -1,
                             ),
                           ),
-                        ),
                       ),
                       const SizedBox(height: 12),
                       Row(
@@ -270,9 +258,9 @@ class _DoctorListScreenState extends State<DoctorListScreen> {
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.05),
+                      color: AppColors.surface,
                       borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: Colors.white.withOpacity(0.1)),
+                      border: Border.all(color: AppColors.border),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
@@ -302,11 +290,11 @@ class _DoctorListScreenState extends State<DoctorListScreen> {
                   child: Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.05),
+                      color: AppColors.surface,
                       shape: BoxShape.circle,
-                      border: Border.all(color: Colors.white.withOpacity(0.1)),
+                      border: Border.all(color: AppColors.border),
                     ),
-                    child: const Icon(Icons.refresh, size: 16, color: AppColors.silver400),
+                    child: const Icon(Icons.refresh, size: 16, color: AppColors.textOnSurface),
                   ),
                 ),
               ],
@@ -335,13 +323,16 @@ class _DoctorListScreenState extends State<DoctorListScreen> {
         child: Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Colors.white.withOpacity(0.06), Colors.white.withOpacity(0.01)],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
+            color: AppColors.surface,
             borderRadius: BorderRadius.circular(28),
-            border: Border.all(color: Colors.white.withOpacity(0.05)),
+            border: Border.all(color: AppColors.border),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.1),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              ),
+            ],
           ),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -378,7 +369,7 @@ class _DoctorListScreenState extends State<DoctorListScreen> {
                       fullName.replaceAll('Dr. ', ''),
                       style: GoogleFonts.plusJakartaSans(
                         fontSize: 18,
-                        color: Colors.white,
+                        color: AppColors.textOnSurface,
                         fontWeight: FontWeight.bold,
                         height: 1.1,
                       ),
@@ -421,13 +412,13 @@ class _DoctorListScreenState extends State<DoctorListScreen> {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: AppColors.textOnSurface,
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: const Text(
                         'BOOK NOW',
                         style: TextStyle(
-                          color: Colors.black,
+                          color: AppColors.surface,
                           fontSize: 9,
                           fontWeight: FontWeight.w900,
                           letterSpacing: 0.5,
@@ -443,9 +434,9 @@ class _DoctorListScreenState extends State<DoctorListScreen> {
                 width: 60, 
                 height: 60,
                 decoration: BoxDecoration(
-                  color: const Color(0xFF1A1A1A),
+                  color: AppColors.surfaceLight,
                   shape: BoxShape.circle,
-                  border: Border.all(color: Colors.white.withOpacity(0.05), width: 2),
+                  border: Border.all(color: AppColors.border, width: 2),
                 ),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(30),
@@ -514,8 +505,8 @@ class _DoctorListScreenState extends State<DoctorListScreen> {
             ElevatedButton(
               onPressed: _loadDoctors,
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.white,
-                foregroundColor: Colors.black,
+                backgroundColor: AppColors.surface,
+                foregroundColor: AppColors.textOnSurface,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               ),
               child: const Text('RETRY'),

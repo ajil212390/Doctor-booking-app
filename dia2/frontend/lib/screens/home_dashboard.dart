@@ -152,18 +152,16 @@ class HomeDashboardState extends State<HomeDashboard> {
       context: context,
       barrierDismissible: false,
       builder: (context) => StatefulBuilder(
-        builder: (context, setDialogState) => BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-          child: AlertDialog(
-            backgroundColor: const Color(0xFF111111),
+        builder: (context, setDialogState) => AlertDialog(
+            backgroundColor: AppColors.surface,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(24),
-              side: BorderSide(color: Colors.white.withOpacity(0.1)),
+              side: const BorderSide(color: AppColors.border),
             ),
             title: Text(
               'How was your consultation?',
               style: GoogleFonts.plusJakartaSans(
-                color: Colors.white,
+                color: AppColors.textOnSurface,
                 fontWeight: FontWeight.bold,
                 fontSize: 18,
               ),
@@ -239,7 +237,6 @@ class HomeDashboardState extends State<HomeDashboard> {
                 child: const Text('SUBMIT', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
               ),
             ],
-          ),
         ),
       ),
     );
@@ -290,7 +287,7 @@ class HomeDashboardState extends State<HomeDashboard> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF111111),
+        backgroundColor: AppColors.surface,
         title: const Text('Logout', style: TextStyle(color: Colors.white)),
         content: const Text('Are you sure you want to sign out?', style: TextStyle(color: AppColors.silver400)),
         actions: [
@@ -317,13 +314,11 @@ class HomeDashboardState extends State<HomeDashboard> {
   void _showRiskInfo() {
     showDialog(
       context: context,
-      builder: (context) => BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-        child: AlertDialog(
-          backgroundColor: const Color(0xFF111111),
+      builder: (context) => AlertDialog(
+          backgroundColor: AppColors.surface,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(24),
-            side: BorderSide(color: Colors.white.withOpacity(0.1)),
+            side: const BorderSide(color: AppColors.border),
           ),
           title: Text(
             'RISK ANALYSIS',
@@ -355,23 +350,12 @@ class HomeDashboardState extends State<HomeDashboard> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0A0A0A),
       body: Stack(
         children: [
-          // Background Gradient
           Container(
             width: double.infinity,
             height: double.infinity,
-            decoration: const BoxDecoration(
-              gradient: RadialGradient(
-                center: Alignment(0, -0.8),
-                radius: 1.5,
-                colors: [
-                  Color(0xFF2A2A2A),
-                  Color(0xFF0A0A0A),
-                ],
-              ),
-            ),
+            color: AppColors.background,
           ),
           SafeArea(
             child: _buildDashboardByRole(),
@@ -390,8 +374,8 @@ class HomeDashboardState extends State<HomeDashboard> {
   Widget _buildPatientDashboard() {
     return RefreshIndicator(
       onRefresh: () => refresh(),
-      color: Colors.white,
-      backgroundColor: const Color(0xFF1A1A1A),
+      color: AppColors.surface,
+      backgroundColor: AppColors.background,
       child: SingleChildScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
@@ -430,7 +414,7 @@ class HomeDashboardState extends State<HomeDashboard> {
             Text(
               _name.toLowerCase(),
               style: GoogleFonts.plusJakartaSans(
-                color: Colors.white,
+                color: AppColors.textOnBackground,
                 fontSize: 28,
                 fontWeight: FontWeight.bold,
                 letterSpacing: -1,
@@ -444,12 +428,12 @@ class HomeDashboardState extends State<HomeDashboard> {
             width: 48,
             height: 48,
             decoration: BoxDecoration(
-              color: const Color(0xFF2A2A2A),
+              color: AppColors.surface,
               shape: BoxShape.circle,
-              border: Border.all(color: const Color(0xFF3A3A3A), width: 2),
+              border: Border.all(color: AppColors.border, width: 2),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.3),
+                  color: Colors.black.withOpacity(0.1),
                   blurRadius: 10,
                   offset: const Offset(0, 4),
                 ),
@@ -471,9 +455,9 @@ class HomeDashboardState extends State<HomeDashboard> {
     return Container(
       padding: const EdgeInsets.all(28),
       decoration: BoxDecoration(
-        color: AppColors.cardBackground,
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(32),
-        border: Border.all(color: AppColors.cardBorder),
+        border: Border.all(color: AppColors.border),
       ),
       child: _latestPrediction == null 
         ? Column(
@@ -487,7 +471,7 @@ class HomeDashboardState extends State<HomeDashboard> {
                       Text(
                         'Risk Assessment',
                         style: GoogleFonts.plusJakartaSans(
-                          color: Colors.white,
+                          color: AppColors.textOnSurface,
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
                           letterSpacing: -0.5,
@@ -543,7 +527,7 @@ class HomeDashboardState extends State<HomeDashboard> {
                             )
                           ]
                         ),
-                        child: const Icon(Icons.add, color: Colors.black, size: 24),
+                        child: const Icon(Icons.add, color: AppColors.textOnSurface, size: 24),
                       ),
                       const SizedBox(height: 16),
                       Text(
@@ -615,8 +599,8 @@ class HomeDashboardState extends State<HomeDashboard> {
                         child: CircularProgressIndicator(
                           value: _getDisplayProbability() / 100,
                           strokeWidth: 10,
-                          backgroundColor: Colors.white.withOpacity(0.05),
-                          color: Colors.white.withOpacity(0.8),
+                          backgroundColor: AppColors.surfaceLight,
+                          color: AppColors.textOnSurface,
                         ),
                       ),
                       Column(
@@ -627,7 +611,7 @@ class HomeDashboardState extends State<HomeDashboard> {
                             child: Text(
                               '${_getDisplayProbability().toStringAsFixed(0)}%',
                               style: GoogleFonts.plusJakartaSans(
-                                color: Colors.white,
+                                color: AppColors.textOnSurface,
                                 fontSize: 24,
                                 fontWeight: FontWeight.bold,
                                 letterSpacing: -1,
@@ -652,7 +636,7 @@ class HomeDashboardState extends State<HomeDashboard> {
                     children: [
                       _buildScoreRow('HEALTH SCORE', 
                           '${(100 - _getDisplayProbability()).toStringAsFixed(0)}/100', 
-                          Colors.white),
+                          AppColors.textOnSurface),
                       const SizedBox(height: 16),
                       _buildScoreRow('LAST UPDATE', 
                           _formatLastUpdate(_latestPrediction!['created_at']), 
@@ -741,7 +725,7 @@ class HomeDashboardState extends State<HomeDashboard> {
                 Text(
                   'My Appointments',
                   style: GoogleFonts.plusJakartaSans(
-                    color: Colors.white,
+                    color: AppColors.textOnBackground,
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
                     letterSpacing: -0.5,
@@ -770,9 +754,9 @@ class HomeDashboardState extends State<HomeDashboard> {
           Container(
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.04),
+              color: AppColors.surface,
               borderRadius: BorderRadius.circular(24),
-              border: Border.all(color: Colors.white.withOpacity(0.08)),
+              border: Border.all(color: AppColors.border),
             ),
             child: Row(
               children: [

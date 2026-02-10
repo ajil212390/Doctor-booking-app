@@ -38,7 +38,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'DiaPredict',
       debugShowCheckedModeBanner: false,
-      theme: AppTheme.darkTheme,
+      theme: AppTheme.theme,
       initialRoute: isLoggedIn ? '/dashboard' : '/welcome',
       routes: {
         '/welcome': (context) => const WelcomeScreen(),

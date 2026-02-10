@@ -39,23 +39,14 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
       body: Stack(
         children: [
-          // Background Light Effects
-          Positioned(
-            top: -100,
-            right: -100,
-            child: Container(
-              width: 300,
-              height: 300,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.white.withOpacity(0.05),
-              ),
-            ).animate(onPlay: (controller) => controller.repeat(reverse: true))
-             .scale(begin: const Offset(1, 1), end: const Offset(1.2, 1.2), duration: 8.seconds),
+          Container(
+            width: double.infinity,
+            height: double.infinity,
+            color: AppColors.background,
           ),
+
           
           Center(
             child: SingleChildScrollView(
@@ -70,7 +61,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       style: TextStyle(
                         fontSize: 40,
                         fontWeight: FontWeight.w800,
-                        color: Colors.white,
+                        color: AppColors.textOnBackground,
                         letterSpacing: -1,
                       ),
                     ),
@@ -109,15 +100,23 @@ class _LoginScreenState extends State<LoginScreen> {
                         const SizedBox(height: 8),
                         TextField(
                           controller: _emailController,
-                          style: const TextStyle(color: Colors.white),
+                          style: const TextStyle(color: AppColors.textOnSurface),
                           decoration: InputDecoration(
                             hintText: 'your@email.com',
-                            hintStyle: TextStyle(color: Colors.white.withOpacity(0.2)),
+                            hintStyle: TextStyle(color: AppColors.textOnSurface.withOpacity(0.3)),
                             filled: true,
-                            fillColor: Colors.white.withOpacity(0.05),
+                            fillColor: AppColors.surfaceLight,
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(16),
-                              borderSide: BorderSide.none,
+                              borderSide: const BorderSide(color: AppColors.border),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(16),
+                              borderSide: const BorderSide(color: AppColors.border),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(16),
+                              borderSide: const BorderSide(color: AppColors.border, width: 2),
                             ),
                             contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                           ),
@@ -136,15 +135,23 @@ class _LoginScreenState extends State<LoginScreen> {
                         TextField(
                           controller: _passwordController,
                           obscureText: true,
-                          style: const TextStyle(color: Colors.white),
+                          style: const TextStyle(color: AppColors.textOnSurface),
                           decoration: InputDecoration(
                             hintText: '••••••••',
-                            hintStyle: TextStyle(color: Colors.white.withOpacity(0.2)),
+                            hintStyle: TextStyle(color: AppColors.textOnSurface.withOpacity(0.3)),
                             filled: true,
-                            fillColor: Colors.white.withOpacity(0.05),
+                            fillColor: AppColors.surfaceLight,
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(16),
-                              borderSide: BorderSide.none,
+                              borderSide: const BorderSide(color: AppColors.border),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(16),
+                              borderSide: const BorderSide(color: AppColors.border),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(16),
+                              borderSide: const BorderSide(color: AppColors.border, width: 2),
                             ),
                             contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                           ),
@@ -158,8 +165,8 @@ class _LoginScreenState extends State<LoginScreen> {
                               width: double.infinity,
                               child: ElevatedButton(
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.white,
-                                  foregroundColor: Colors.black,
+                                  backgroundColor: AppColors.surface,
+                                  foregroundColor: AppColors.textOnSurface,
                                   minimumSize: const Size(double.infinity, 56),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(16),
@@ -189,12 +196,12 @@ class _LoginScreenState extends State<LoginScreen> {
                         children: [
                           const TextSpan(
                             text: "Don't have an account? ",
-                            style: TextStyle(color: AppColors.silver500),
+                            style: TextStyle(color: AppColors.darkMetallicText), // Adjusted text color
                           ),
                           TextSpan(
                             text: 'Sign Up',
-                            style: TextStyle(
-                              color: Colors.white,
+                            style: const TextStyle(
+                              color: AppColors.textOnCreamBackground, // Changed to textOnCreamBackground
                               fontWeight: FontWeight.bold,
                               decoration: TextDecoration.underline,
                             ),

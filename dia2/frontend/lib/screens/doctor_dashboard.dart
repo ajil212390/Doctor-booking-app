@@ -152,26 +152,12 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
-      body: Container(
-        height: double.infinity,
-        width: double.infinity,
-        decoration: const BoxDecoration(
-          gradient: RadialGradient(
-            center: Alignment(0, -1),
-            radius: 1.5,
-            colors: [
-              Color(0xFF1A1A1A),
-              Color(0xFF0A0A0A),
-            ],
-          ),
-        ),
-        child: SafeArea(
-          bottom: false,
-          child: RefreshIndicator(
-            onRefresh: _handleRefresh,
-            color: Colors.white,
-            backgroundColor: const Color(0xFF1A1A1A),
+      body: SafeArea(
+        bottom: false,
+        child: RefreshIndicator(
+          onRefresh: _handleRefresh,
+          color: AppColors.surface,
+          backgroundColor: AppColors.background,
             child: SingleChildScrollView(
               physics: const AlwaysScrollableScrollPhysics(),
               padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -192,8 +178,7 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
             ),
           ),
         ),
-      ),
-    );
+      );
   }
 
   Widget _buildHeader() {
@@ -203,16 +188,13 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            ShaderMask(
-              shaderCallback: (bounds) => AppColors.silverGradient.createShader(bounds),
-              child: Text(
-                _doctorName,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: -0.5,
-                ),
+            Text(
+              _doctorName,
+              style: const TextStyle(
+                color: AppColors.textOnBackground,
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
+                letterSpacing: -0.5,
               ),
             ),
             const SizedBox(height: 4),
@@ -232,10 +214,10 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
           height: 48,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            border: Border.all(color: Colors.white.withOpacity(0.1), width: 1),
+            border: Border.all(color: AppColors.surface.withOpacity(0.1), width: 1),
             boxShadow: [
               BoxShadow(
-                color: Colors.white.withOpacity(0.05),
+                color: Colors.black.withOpacity(0.1),
                 blurRadius: 10,
                 spreadRadius: 2,
               ),
@@ -304,9 +286,16 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Colors.white.withOpacity(0.1)),
+        border: Border.all(color: AppColors.border),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.2),
+            blurRadius: 15,
+            offset: const Offset(0, 8),
+          ),
+        ],
       ),
       child: Column(
         children: [
@@ -326,15 +315,12 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
                     ),
                   ),
                   const SizedBox(height: 4),
-                  ShaderMask(
-                    shaderCallback: (bounds) => AppColors.silverGradient.createShader(bounds),
-                    child: Text(
-                      '${todaysAppointments.length} Appointments',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                      ),
+                  Text(
+                    '${todaysAppointments.length} Appointments',
+                    style: const TextStyle(
+                      color: AppColors.textOnSurface,
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
                 ],
@@ -342,16 +328,16 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.08),
+                  color: AppColors.surfaceLight,
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: const Icon(Icons.calendar_today_outlined, color: AppColors.silver200, size: 20),
+                child: const Icon(Icons.calendar_today_outlined, color: AppColors.textOnSurface, size: 20),
               ),
             ],
           ),
           const SizedBox(height: 24),
           if (_isLoading)
-            const Center(child: CircularProgressIndicator(color: Colors.white))
+            const Center(child: CircularProgressIndicator(color: AppColors.textOnSurface))
           else if (todaysAppointments.isEmpty)
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 20),
@@ -420,9 +406,9 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.03),
+        color: AppColors.surfaceLight,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withOpacity(0.05)),
+        border: Border.all(color: AppColors.border),
       ),
       child: Row(
         children: [
@@ -435,12 +421,12 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
               const SizedBox(height: 2),
               Text(
                 period,
-                style: const TextStyle(color: AppColors.silver200, fontSize: 12, fontWeight: FontWeight.bold),
+                style: const TextStyle(color: AppColors.textOnSurface, fontSize: 12, fontWeight: FontWeight.bold),
               ),
             ],
           ),
           const SizedBox(width: 16),
-          Container(width: 1, height: 24, color: Colors.white.withOpacity(0.1)),
+          Container(width: 1, height: 24, color: AppColors.border),
           const SizedBox(width: 16),
           Expanded(
             child: Column(
@@ -448,7 +434,7 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
               children: [
                 Text(
                   name,
-                  style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600),
+                  style: const TextStyle(color: AppColors.textOnSurface, fontSize: 14, fontWeight: FontWeight.w600),
                 ),
                 const SizedBox(height: 2),
                 Text(
@@ -470,37 +456,30 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
         Expanded(
           child: GestureDetector(
             onTap: () => Navigator.pushNamed(context, '/manage-slots'),
-            child: _buildGlassButton(Icons.event_available, 'Availability'),
+            child: _buildMetallicButton(Icons.event_available, 'Availability'),
           ),
         ),
         const SizedBox(width: 12),
         Expanded(
           child: GestureDetector(
             onTap: () => Navigator.pushNamed(context, '/patient-list'),
-            child: _buildGlassButton(Icons.list_alt, 'View Schedule'),
+            child: _buildMetallicButton(Icons.list_alt, 'View Schedule'),
           ),
         ),
       ],
     );
   }
 
-  Widget _buildGlassButton(IconData icon, String label) {
+  Widget _buildMetallicButton(IconData icon, String label) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 16),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            Colors.white.withOpacity(0.1),
-            Colors.white.withOpacity(0.05),
-          ],
-        ),
+        gradient: AppColors.metallicGradient,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withOpacity(0.1)),
+        border: Border.all(color: AppColors.border),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.2),
+            color: Colors.black.withOpacity(0.3),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -509,12 +488,12 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(icon, color: Colors.white, size: 20),
+          Icon(icon, color: AppColors.textOnSurface, size: 20),
           const SizedBox(width: 8),
           Text(
             label,
             style: const TextStyle(
-              color: Colors.white,
+              color: AppColors.textOnSurface,
               fontSize: 13,
               fontWeight: FontWeight.w600,
               letterSpacing: 0.5,
@@ -562,10 +541,10 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
             width: double.infinity,
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.03),
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: Colors.white.withOpacity(0.05)),
-            ),
+            color: AppColors.surface,
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(color: AppColors.border),
+          ),
             child: Column(
               children: [
                 Icon(Icons.chat_bubble_outline, color: Colors.white.withOpacity(0.1), size: 32),
@@ -602,9 +581,16 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.03),
+          color: AppColors.surface,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Colors.white.withOpacity(0.05)),
+          border: Border.all(color: AppColors.border),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -614,7 +600,7 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
               children: [
                 Text(
                   patientName,
-                  style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold),
+                  style: const TextStyle(color: AppColors.textOnSurface, fontSize: 13, fontWeight: FontWeight.bold),
                 ),
                 Row(
                   mainAxisSize: MainAxisSize.min,
@@ -632,12 +618,12 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
             const SizedBox(height: 2),
             Text(
               dateStr,
-              style: const TextStyle(color: AppColors.silver500, fontSize: 9),
+              style: TextStyle(color: AppColors.silver500.withOpacity(0.7), fontSize: 9),
             ),
             const SizedBox(height: 8),
             Text(
               comment,
-              style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 12, height: 1.4),
+              style: TextStyle(color: AppColors.textOnSurface.withOpacity(0.8), fontSize: 12, height: 1.4),
             ),
           ],
         ),

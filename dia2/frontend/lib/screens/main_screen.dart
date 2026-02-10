@@ -74,7 +74,7 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: AppColors.background,
       resizeToAvoidBottomInset: true,
       body: Stack(
         children: [
@@ -103,7 +103,7 @@ class _MainScreenState extends State<MainScreen> {
                 width: 120,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.1),
+                  color: AppColors.border.withOpacity(0.2),
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -115,34 +115,36 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   Widget _buildGlassBottomNav() {
-    return ClipRRect(
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-        child: Container(
-          padding: const EdgeInsets.only(top: 16, bottom: 40, left: 24, right: 24),
-          decoration: BoxDecoration(
-            color: const Color(0xCC0A0A0A),
-            border: Border(
-              top: BorderSide(color: Colors.white.withOpacity(0.05)),
-            ),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: _role == 'DOCTOR' 
-              ? [
-                  _buildNavItem(0, Icons.home_outlined, Icons.home, 'HOME'),
-                  _buildNavItem(1, Icons.calendar_month_outlined, Icons.calendar_month, 'CHART'),
-                  _buildNavItem(2, Icons.people_outline, Icons.people, 'PATIENTS'),
-                  _buildNavItem(3, Icons.settings_outlined, Icons.settings, 'SETTINGS'),
-                ]
-              : [
-                  _buildNavItem(0, Icons.home_outlined, Icons.home, 'HOME'),
-                  _buildNavItem(1, Icons.query_stats_outlined, Icons.query_stats, 'PREDICT'),
-                  _buildNavItem(2, Icons.calendar_month_outlined, Icons.calendar_month, 'DOCTORS'),
-                  _buildNavItem(3, Icons.person_outline, Icons.person, 'PROFILE'),
-                ],
-          ),
+    return Container(
+      padding: const EdgeInsets.only(top: 16, bottom: 40, left: 24, right: 24),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        border: Border(
+          top: BorderSide(color: AppColors.border),
         ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.2),
+            blurRadius: 20,
+            offset: const Offset(0, -4),
+          ),
+        ],
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: _role == 'DOCTOR' 
+          ? [
+              _buildNavItem(0, Icons.home_outlined, Icons.home, 'HOME'),
+              _buildNavItem(1, Icons.calendar_month_outlined, Icons.calendar_month, 'CHART'),
+              _buildNavItem(2, Icons.people_outline, Icons.people, 'PATIENTS'),
+              _buildNavItem(3, Icons.settings_outlined, Icons.settings, 'SETTINGS'),
+            ]
+          : [
+              _buildNavItem(0, Icons.home_outlined, Icons.home, 'HOME'),
+              _buildNavItem(1, Icons.query_stats_outlined, Icons.query_stats, 'PREDICT'),
+              _buildNavItem(2, Icons.calendar_month_outlined, Icons.calendar_month, 'DOCTORS'),
+              _buildNavItem(3, Icons.person_outline, Icons.person, 'PROFILE'),
+            ],
       ),
     );
   }
@@ -162,14 +164,14 @@ class _MainScreenState extends State<MainScreen> {
         children: [
           Icon(
             isActive ? filledIcon : outlineIcon,
-            color: isActive ? Colors.white : const Color(0xFF64748B),
+            color: isActive ? AppColors.textOnSurface : AppColors.silver500,
             size: 26,
           ),
           const SizedBox(height: 6),
           Text(
             label,
             style: TextStyle(
-              color: isActive ? Colors.white : const Color(0xFF64748B),
+              color: isActive ? AppColors.textOnSurface : AppColors.silver500,
               fontSize: 10,
               fontWeight: isActive ? FontWeight.w600 : FontWeight.w500,
               letterSpacing: 1.2,

@@ -183,10 +183,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
             child: Opacity(
               opacity: anim1.value,
               child: AlertDialog(
-                backgroundColor: const Color(0xFF111111).withOpacity(0.8),
+                backgroundColor: AppColors.surface,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(32),
-                  side: BorderSide(color: Colors.white.withOpacity(0.1)),
+                  side: const BorderSide(color: AppColors.border),
                 ),
                 title: Text(
                   'EDIT PROFILE',
@@ -268,9 +268,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
         const SizedBox(height: 8),
         Container(
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.05),
+            color: AppColors.surfaceLight,
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: Colors.white.withOpacity(0.1)),
+            border: Border.all(color: AppColors.border),
           ),
           child: TextField(
             controller: controller,
@@ -301,10 +301,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
             child: Opacity(
               opacity: anim1.value,
               child: AlertDialog(
-                backgroundColor: const Color(0xFF111111).withOpacity(0.8),
+                backgroundColor: AppColors.surface,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(32),
-                  side: BorderSide(color: Colors.white.withOpacity(0.1)),
+                  side: const BorderSide(color: AppColors.border),
                 ),
                 title: Text('LOGOUT', style: GoogleFonts.plusJakartaSans(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
                 content: const Text('Are you sure you want to end your session?', style: TextStyle(color: Color(0xFF94A3B8))),
@@ -338,29 +338,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final isDoctor = _role.toUpperCase() == 'DOCTOR';
     
     return Scaffold(
-      backgroundColor: const Color(0xFF0A0A0A),
       body: Stack(
         children: [
-          // Background Gradient
           Container(
             width: double.infinity,
             height: double.infinity,
-            decoration: const BoxDecoration(
-              gradient: RadialGradient(
-                center: Alignment(1, -1),
-                radius: 1.5,
-                colors: [Color(0xFF1A1A1A), Color(0xFF0A0A0A)],
-              ),
-            ),
+            color: AppColors.background,
           ),
 
           SafeArea(
             child: _isLoading 
-              ? const Center(child: CircularProgressIndicator(color: Colors.white))
+              ? const Center(child: CircularProgressIndicator(color: AppColors.surface))
               : RefreshIndicator(
                   onRefresh: _loadUserData,
-                  color: Colors.white,
-                  backgroundColor: const Color(0xFF1A1A1A),
+                  color: AppColors.surface,
+                  backgroundColor: AppColors.background,
                   child: SingleChildScrollView(
                     physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
                     padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
@@ -368,19 +360,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       children: [
                       const SizedBox(height: 20),
                       // Header
-                      ShaderMask(
-                        shaderCallback: (bounds) => const LinearGradient(
-                          colors: [Colors.white, Color(0xFF94A3B8)],
-                        ).createShader(bounds),
-                        child: Text(
+                        Text(
                           isDoctor ? 'Doctor Profile' : 'Account Profile',
                           style: GoogleFonts.plusJakartaSans(
-                            color: Colors.white,
+                            color: AppColors.textOnBackground,
                             fontSize: 32,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                      ),
                       const SizedBox(height: 48),
 
                       // Avatar Section
@@ -391,7 +378,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               padding: const EdgeInsets.all(4),
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
-                                border: Border.all(color: const Color(0xFF3A3A3A), width: 3),
+                                border: Border.all(color: AppColors.border, width: 3),
                               ),
                               child: Container(
                                 decoration: BoxDecoration(
@@ -406,7 +393,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 ),
                                 child: CircleAvatar(
                                   radius: 64,
-                                  backgroundColor: const Color(0xFF2A2A2A),
+                                  backgroundColor: AppColors.surface,
                                   backgroundImage: _profilePicture != null
                                       ? NetworkImage(
                                           _profilePicture!.startsWith('http')
@@ -421,7 +408,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                           _name.isNotEmpty ? _name[0].toUpperCase() : 'U',
                                           style: GoogleFonts.plusJakartaSans(
                                             fontSize: 48,
-                                            color: Colors.white,
+                                            color: AppColors.textOnSurface,
                                             fontWeight: FontWeight.w600,
                                           ),
                                         )
@@ -460,10 +447,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       // User Identity
                       Text(
                         _name.toUpperCase(),
-                        style: GoogleFonts.plusJakartaSans(
+                          style: GoogleFonts.plusJakartaSans(
                           fontSize: 22,
                           fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                          color: AppColors.textOnBackground,
                           letterSpacing: 1,
                         ),
                         textAlign: TextAlign.center,
@@ -480,14 +467,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.05),
+                          color: AppColors.surface,
                           borderRadius: BorderRadius.circular(20),
-                          border: Border.all(color: Colors.white.withOpacity(0.1)),
+                          border: Border.all(color: AppColors.border),
                         ),
                         child: Text(
                           _role.toUpperCase(),
                           style: const TextStyle(
-                            color: Color(0xFF64748B),
+                            color: AppColors.textOnSurface,
                             fontSize: 10,
                             fontWeight: FontWeight.bold,
                             letterSpacing: 1.5,
@@ -562,14 +549,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             width: double.infinity,
                             padding: const EdgeInsets.all(20),
                             decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.03),
+                              color: AppColors.surface,
                               borderRadius: BorderRadius.circular(20),
-                              border: Border.all(color: Colors.white.withOpacity(0.08)),
+                              border: Border.all(color: AppColors.border),
                             ),
                             child: Text(
                               _doctorProfile!['bio'],
                               style: const TextStyle(
-                                color: Color(0xFF94A3B8),
+                                color: AppColors.textOnSurface,
                                 fontSize: 14,
                                 height: 1.6,
                               ),
@@ -593,9 +580,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             width: double.infinity,
                             padding: const EdgeInsets.all(24),
                             decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.03),
+                              color: AppColors.surface,
                               borderRadius: BorderRadius.circular(24),
-                              border: Border.all(color: Colors.white.withOpacity(0.1)),
+                              border: Border.all(color: AppColors.border),
                             ),
                             child: Column(
                               children: [
@@ -621,9 +608,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           width: double.infinity,
                           padding: const EdgeInsets.symmetric(vertical: 20),
                           decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.03),
+                            color: AppColors.surface,
                             borderRadius: BorderRadius.circular(24),
-                            border: Border.all(color: Colors.white.withOpacity(0.1)),
+                            border: Border.all(color: AppColors.border),
                           ),
                           child: const Center(
                             child: Text(
@@ -674,9 +661,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.03),
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withOpacity(0.06)),
+        border: Border.all(color: AppColors.border),
       ),
       child: Row(
         children: [
@@ -705,7 +692,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 Text(
                   value,
                   style: const TextStyle(
-                    color: Colors.white,
+                    color: AppColors.textOnSurface,
                     fontSize: 15,
                     fontWeight: FontWeight.w500,
                   ),
@@ -786,18 +773,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
       padding: const EdgeInsets.only(bottom: 16),
       child: GestureDetector(
         onTap: onTap,
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(28),
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-            child: Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.03),
-                borderRadius: BorderRadius.circular(28),
-                border: Border.all(color: Colors.white.withOpacity(0.1)),
-              ),
-              child: Row(
+        child: Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: AppColors.surface,
+            borderRadius: BorderRadius.circular(28),
+            border: Border.all(color: AppColors.border),
+          ),
+          child: Row(
                 children: [
                   Container(
                     padding: const EdgeInsets.all(12),
@@ -837,8 +820,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
           ),
         ),
-      ),
-    ).animate().fadeIn(duration: 500.ms).slideX(begin: 0.05, end: 0);
+      ).animate().fadeIn(duration: 500.ms).slideX(begin: 0.05, end: 0);
   }
 
   Widget _buildHistoryItem(dynamic history) {

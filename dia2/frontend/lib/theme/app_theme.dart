@@ -2,56 +2,87 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class AppColors {
-  static const Color background = Color(0xFF000000);
-  static const Color cardBackground = Color(0x0DFFFFFF); // rgba(255, 255, 255, 0.05)
-  static const Color cardBackgroundBright = Color(0x14FFFFFF); // rgba(255, 255, 255, 0.08)
-  static const Color cardBorder = Color(0x1AFFFFFF); // rgba(255, 255, 255, 0.1)
-  static const Color cardBorderBright = Color(0x26FFFFFF); // rgba(255, 255, 255, 0.15)
+  static const Color background = Color(0xFFFDF5E6); // Cream
+  static const Color surface = Color(0xFF121212); // Metallic Black
+  static const Color surfaceLight = Color(0xFF1E1E1E); // Lighter Metallic
+  static const Color border = Color(0xFF2C2C2C); // Metallic Border
   
+  static const Color accent = Color(0xFF121212); 
+  static const Color textOnBackground = Color(0xFF121212);
+  static const Color textOnSurface = Color(0xFFFDF5E6);
+  static const Color textOnCreamBackground = Color(0xFF121212);
+  static const Color darkMetallicText = Color(0xFF2C2C2C);
+  static const Color black = Color(0xFF121212);
+
+  static const LinearGradient metallicGradient = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [
+      Color(0xFF1A1A1A),
+      Color(0xFF000000),
+      Color(0xFF2C2C2C),
+    ],
+    stops: [0.0, 0.5, 1.0],
+  );
+
   static const Color silver100 = Color(0xFFF1F5F9);
   static const Color silver200 = Color(0xFFE2E8F0);
   static const Color silver300 = Color(0xFFCBD5E1);
   static const Color silver400 = Color(0xFF94A3B8);
   static const Color silver500 = Color(0xFF64748B);
   static const Color silver600 = Color(0xFF475569);
+  
+  // Legacy aliases for compatibility
+  static const Color cardBackground = surface;
+  static const Color cardBackgroundBright = surfaceLight;
+  static const Color cardBorder = border;
+  static const Color cardBorderBright = Color(0x26FFFFFF);
 
   static const LinearGradient silverGradient = LinearGradient(
     begin: Alignment.topCenter,
     end: Alignment.bottomCenter,
     colors: [
-      Colors.white,
-      Color(0xFF94A3B8),
+      Color(0xFF121212),
+      Color(0xFF454545),
     ],
   );
 }
 
 class AppTheme {
-  static ThemeData get darkTheme {
+  static ThemeData get theme {
     return ThemeData(
-      brightness: Brightness.dark,
+      brightness: Brightness.light,
       scaffoldBackgroundColor: AppColors.background,
-      colorScheme: const ColorScheme.dark(
-        primary: Colors.white,
-        secondary: AppColors.silver400,
-        surface: AppColors.cardBackground,
+      colorScheme: const ColorScheme.light(
+        primary: AppColors.surface,
+        secondary: AppColors.surfaceLight,
+        surface: AppColors.surface,
+        onSurface: AppColors.textOnSurface,
+        onBackground: AppColors.textOnBackground,
       ),
-      textTheme: GoogleFonts.plusJakartaSansTextTheme(ThemeData.dark().textTheme).copyWith(
+      textTheme: GoogleFonts.plusJakartaSansTextTheme().copyWith(
         displayLarge: GoogleFonts.plusJakartaSans(
-          color: Colors.white,
+          color: AppColors.textOnBackground,
           fontWeight: FontWeight.bold,
         ),
         headlineMedium: GoogleFonts.plusJakartaSans(
-          color: Colors.white,
+          color: AppColors.textOnBackground,
           fontWeight: FontWeight.bold,
+        ),
+        bodyLarge: GoogleFonts.plusJakartaSans(
+          color: AppColors.textOnBackground,
+        ),
+        bodyMedium: GoogleFonts.plusJakartaSans(
+          color: AppColors.textOnBackground,
         ),
       ),
       cardTheme: CardThemeData(
-        color: AppColors.cardBackground,
+        color: AppColors.surface,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
-          side: const BorderSide(color: AppColors.cardBorder),
+          side: const BorderSide(color: AppColors.border, width: 1),
         ),
-        elevation: 0,
+        elevation: 8,
       ),
       useMaterial3: true,
     );
