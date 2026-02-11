@@ -36,6 +36,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
   String _selectedRole = 'USER';
   bool _isRoleInitialized = false;
   bool _isLoading = false;
+  bool _obscurePassword = true;
+  bool _obscureConfirmPassword = true;
 
   @override
   void didChangeDependencies() {
@@ -199,11 +201,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         const SizedBox(height: 16),
                         
                         _buildLabel('PASSWORD'),
-                        _buildTextField(_passwordController, '••••••••', obscureText: true, validator: (v) => v!.length < 6 ? 'Min 6 characters' : null),
+                        _buildTextField(_passwordController, '••••••••', obscureText: _obscurePassword, validator: (v) => v!.length < 6 ? 'Min 6 characters' : null, onToggleObscure: () => setState(() => _obscurePassword = !_obscurePassword)),
                         const SizedBox(height: 16),
                         
                         _buildLabel('CONFIRM PASSWORD'),
-                        _buildTextField(_passwordConfirmController, '••••••••', obscureText: true, validator: (v) => v != _passwordController.text ? 'Passwords must match' : null),
+                        _buildTextField(_passwordConfirmController, '••••••••', obscureText: _obscureConfirmPassword, validator: (v) => v != _passwordController.text ? 'Passwords must match' : null, onToggleObscure: () => setState(() => _obscureConfirmPassword = !_obscureConfirmPassword)),
                         
                         if (_selectedRole == 'DOCTOR') ...[
                           const SizedBox(height: 32),
@@ -357,13 +359,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
-  Widget _buildTextField(TextEditingController controller, String hint, {bool obscureText = false, TextInputType? keyboardType, String? Function(String?)? validator, IconData? icon, int maxLines = 1}) {
+  Widget _buildTextField(TextEditingController controller, String hint, {bool obscureText = false, TextInputType? keyboardType, String? Function(String?)? validator, IconData? icon, int maxLines = 1, VoidCallback? onToggleObscure}) {
     return TextFormField(
       controller: controller,
       obscureText: obscureText,
       keyboardType: keyboardType,
       validator: validator,
-      maxLines: maxLines,
+      maxLines: obscureText ? 1 : maxLines,
       style: const TextStyle(color: Colors.white),
       decoration: InputDecoration(
         hintText: hint,
@@ -371,6 +373,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
         filled: true,
         fillColor: Colors.white.withOpacity(0.05),
         prefixIcon: icon != null ? Icon(icon, color: Colors.white.withOpacity(0.5)) : null,
+        suffixIcon: onToggleObscure != null
+            ? GestureDetector(
+                onTap: onToggleObscure,
+                child: Icon(
+                  obscureText ? Icons.visibility_off_rounded : Icons.visibility_rounded,
+                  color: Colors.white.withOpacity(0.3),
+                  size: 20,
+                ),
+              )
+            : null,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
           borderSide: BorderSide.none,

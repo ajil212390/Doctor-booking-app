@@ -27,6 +27,14 @@ class _MainScreenState extends State<MainScreen> {
   void initState() {
     super.initState();
     _loadRole();
+    // Check for pending reviews after the first frame renders (home tab is visible by default)
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Future.delayed(const Duration(seconds: 2), () {
+        if (_currentIndex == 0) {
+          _homeKey.currentState?.checkPendingReviews();
+        }
+      });
+    });
   }
 
   void _loadRole() async {
@@ -155,6 +163,12 @@ class _MainScreenState extends State<MainScreen> {
           _homeKey.currentState?.refresh();
         }
         setState(() => _currentIndex = index);
+        // Only check pending reviews when switching to home tab
+        if (index == 0) {
+          Future.delayed(const Duration(milliseconds: 500), () {
+            _homeKey.currentState?.checkPendingReviews();
+          });
+        }
       },
       behavior: HitTestBehavior.opaque,
       child: Column(

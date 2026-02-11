@@ -185,7 +185,7 @@ class _ManageSlotsScreenState extends State<ManageSlotsScreen> {
         _fetchSlots(); // Refresh list from backend
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Slot saved to cloud!', style: TextStyle(color: Colors.white)),
+            content: Text('Slot saved !', style: TextStyle(color: Colors.white)),
             backgroundColor: Color(0xFF10B981),
             behavior: SnackBarBehavior.floating,
           ),

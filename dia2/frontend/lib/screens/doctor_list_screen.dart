@@ -15,11 +15,14 @@ class DoctorListScreen extends StatefulWidget {
 }
 
 class _DoctorListScreenState extends State<DoctorListScreen> {
-  List<Map<String, dynamic>> _doctors = [];
+  List<Map<String, dynamic>> _allDoctors = []; // original unfiltered list
+  List<Map<String, dynamic>> _doctors = [];    // filtered/sorted list for display
   bool _isLoading = true;
   String? _error;
   bool _locationEnabled = false;
   String _sortMode = 'distance'; // 'distance' or 'name'
+  String _searchQuery = '';
+  final TextEditingController _searchController = TextEditingController();
 
   final LocationService _locationService = LocationService();
 
@@ -27,6 +30,12 @@ class _DoctorListScreenState extends State<DoctorListScreen> {
   void initState() {
     super.initState();
     _loadDoctors();
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
   }
 
   Future<void> _loadDoctors() async {
@@ -51,11 +60,11 @@ class _DoctorListScreenState extends State<DoctorListScreen> {
 
       if (userLocation != null) {
         // Sort by distance
-        _doctors = _locationService.sortDoctorsByDistance(doctors, userLocation);
+        _allDoctors = _locationService.sortDoctorsByDistance(doctors, userLocation);
         _locationEnabled = true;
       } else {
         // No location, just convert to list
-        _doctors = doctors.map((d) => {
+        _allDoctors = doctors.map((d) => {
           ...Map<String, dynamic>.from(d),
           'distance': null,
           'distance_display': 'Location unavailable',
@@ -63,6 +72,7 @@ class _DoctorListScreenState extends State<DoctorListScreen> {
         _locationEnabled = false;
       }
 
+      _filterAndSortDoctors();
       setState(() => _isLoading = false);
     } catch (e) {
       setState(() {
@@ -72,27 +82,49 @@ class _DoctorListScreenState extends State<DoctorListScreen> {
     }
   }
 
-  void _toggleSortMode() {
+  String _getDoctorName(Map<String, dynamic> doc) {
+    return (doc['full_name'] ?? doc['name'] ?? doc['user']?['name'] ?? '').toString().toLowerCase();
+  }
+
+  void _filterAndSortDoctors() {
+    // Filter by search query
+    List<Map<String, dynamic>> filtered = _allDoctors;
+    if (_searchQuery.isNotEmpty) {
+      final query = _searchQuery.toLowerCase();
+      filtered = _allDoctors.where((doc) {
+        final name = _getDoctorName(doc);
+        final qualification = (doc['qualification'] ?? doc['specialization'] ?? '').toString().toLowerCase();
+        final city = (doc['city'] ?? '').toString().toLowerCase();
+        return name.contains(query) || qualification.contains(query) || city.contains(query);
+      }).toList();
+    }
+
+    // Sort
+    if (_sortMode == 'name') {
+      filtered.sort((a, b) {
+        final nameA = _getDoctorName(a);
+        final nameB = _getDoctorName(b);
+        return nameA.compareTo(nameB);
+      });
+    } else {
+      filtered.sort((a, b) {
+        final distA = a['distance'] as double?;
+        final distB = b['distance'] as double?;
+        if (distA == null && distB == null) return 0;
+        if (distA == null) return 1;
+        if (distB == null) return -1;
+        return distA.compareTo(distB);
+      });
+    }
+
     setState(() {
-      if (_sortMode == 'distance') {
-        _sortMode = 'name';
-        _doctors.sort((a, b) {
-          final nameA = a['full_name']?.toString() ?? '';
-          final nameB = b['full_name']?.toString() ?? '';
-          return nameA.compareTo(nameB);
-        });
-      } else {
-        _sortMode = 'distance';
-        _doctors.sort((a, b) {
-          final distA = a['distance'] as double?;
-          final distB = b['distance'] as double?;
-          if (distA == null && distB == null) return 0;
-          if (distA == null) return 1;
-          if (distB == null) return -1;
-          return distA.compareTo(distB);
-        });
-      }
+      _doctors = filtered;
     });
+  }
+
+  void _toggleSortMode() {
+    _sortMode = _sortMode == 'distance' ? 'name' : 'distance';
+    _filterAndSortDoctors();
   }
 
   @override
@@ -129,7 +161,7 @@ class _DoctorListScreenState extends State<DoctorListScreen> {
                     child: CustomScrollView(
                       physics: const AlwaysScrollableScrollPhysics(),
                       slivers: [
-                        _buildHeader(_doctors.length),
+                        _buildHeader(_allDoctors.length),
                         if (_doctors.isEmpty)
                           SliverFillRemaining(
                             child: _buildEmptyState(),
@@ -166,69 +198,93 @@ class _DoctorListScreenState extends State<DoctorListScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(left: 2),
-                        child: ShaderMask(
-                          shaderCallback: (bounds) => AppColors.silverGradient.createShader(bounds),
-                          child: Text(
-                            'Medical\nSpecialists',
-                            style: GoogleFonts.plusJakartaSans(
-                              fontSize: 32,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                              height: 1.1,
-                              letterSpacing: -1,
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      Row(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFF10B981).withOpacity(0.1),
-                              borderRadius: BorderRadius.circular(20),
-                              border: Border.all(color: const Color(0xFF10B981).withOpacity(0.2)),
-                            ),
-                            child: Text(
-                              '$count ACTIVE',
-                              style: const TextStyle(
-                                color: Color(0xFF10B981),
-                                fontSize: 10,
-                                fontWeight: FontWeight.bold,
-                                letterSpacing: 1,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          const Text(
-                            'Find your expert',
-                            style: TextStyle(
-                              color: Color(0xFF94A3B8),
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
+            Padding(
+              padding: const EdgeInsets.only(left: 2),
+              child: ShaderMask(
+                shaderCallback: (bounds) => AppColors.silverGradient.createShader(bounds),
+                child: Text(
+                  'Medical\nSpecialists',
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 32,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                    height: 1.1,
+                    letterSpacing: -1,
                   ),
                 ),
-              ],
+              ),
             ),
             const SizedBox(height: 16),
-            // Sort and Location Info
+            // Search bar
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.05),
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: Colors.white.withOpacity(0.08)),
+              ),
+              child: TextField(
+                controller: _searchController,
+                style: GoogleFonts.plusJakartaSans(
+                  color: Colors.white,
+                  fontSize: 14,
+                ),
+                decoration: InputDecoration(
+                  hintText: 'Search by name, specialization, city...',
+                  hintStyle: GoogleFonts.plusJakartaSans(
+                    color: Colors.white.withOpacity(0.25),
+                    fontSize: 13,
+                  ),
+                  prefixIcon: Icon(
+                    Icons.search_rounded,
+                    color: Colors.white.withOpacity(0.3),
+                    size: 20,
+                  ),
+                  suffixIcon: _searchQuery.isNotEmpty
+                      ? GestureDetector(
+                          onTap: () {
+                            _searchController.clear();
+                            _searchQuery = '';
+                            _filterAndSortDoctors();
+                          },
+                          child: Icon(
+                            Icons.close_rounded,
+                            color: Colors.white.withOpacity(0.3),
+                            size: 18,
+                          ),
+                        )
+                      : null,
+                  border: InputBorder.none,
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                ),
+                onChanged: (value) {
+                  _searchQuery = value;
+                  _filterAndSortDoctors();
+                },
+              ),
+            ),
+            const SizedBox(height: 16),
+            // Sort, Location and Count chips
             Row(
               children: [
+                // Active count badge
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF10B981).withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: const Color(0xFF10B981).withOpacity(0.2)),
+                  ),
+                  child: Text(
+                    '$count ACTIVE',
+                    style: const TextStyle(
+                      color: Color(0xFF10B981),
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 1,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
                 // Location Status
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -263,7 +319,7 @@ class _DoctorListScreenState extends State<DoctorListScreen> {
                     ],
                   ),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: 8),
                 // Sort Toggle
                 GestureDetector(
                   onTap: _toggleSortMode,
@@ -293,20 +349,6 @@ class _DoctorListScreenState extends State<DoctorListScreen> {
                         ),
                       ],
                     ),
-                  ),
-                ),
-                const Spacer(),
-                // Refresh Location
-                GestureDetector(
-                  onTap: _loadDoctors,
-                  child: Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.05),
-                      shape: BoxShape.circle,
-                      border: Border.all(color: Colors.white.withOpacity(0.1)),
-                    ),
-                    child: const Icon(Icons.refresh, size: 16, color: AppColors.silver400),
                   ),
                 ),
               ],

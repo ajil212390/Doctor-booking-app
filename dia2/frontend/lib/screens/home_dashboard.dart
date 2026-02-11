@@ -54,13 +54,11 @@ class HomeDashboardState extends State<HomeDashboard> {
         });
       }
       _fetchAppointments();
-      _checkPendingReviews();
       return;
     }
     await Future.wait([
       Future.sync(() => _loadLatestPrediction()),
       Future.sync(() => _fetchAppointments()),
-      Future.sync(() => _checkPendingReviews()),
     ]);
   }
 
@@ -84,7 +82,7 @@ class HomeDashboardState extends State<HomeDashboard> {
     }
   }
 
-  void _checkPendingReviews() async {
+  void checkPendingReviews() async {
     if (_role == 'DOCTOR') return;
     
     try {
@@ -100,16 +98,9 @@ class HomeDashboardState extends State<HomeDashboard> {
           // Backend check: already submitted
           if (apt['review_submitted'] == true) return false;
           
-          // Frontend check: persistent dismissal cooldown (24 hours)
-          final dismissedAtStr = prefs.getString('review_dismissed_at_$id');
-          if (dismissedAtStr != null) {
-            final dismissedAt = DateTime.tryParse(dismissedAtStr);
-            if (dismissedAt != null) {
-              if (now.difference(dismissedAt).inHours < 24) {
-                return false;
-              }
-            }
-          }
+          // Frontend check: permanently dismissed
+          final isDismissed = prefs.getBool('review_dismissed_$id') ?? false;
+          if (isDismissed) return false;
           
           final status = apt['status']?.toString().toUpperCase() ?? 'PENDING';
           final isCompleted = status == 'COMPLETED';
@@ -128,8 +119,8 @@ class HomeDashboardState extends State<HomeDashboard> {
             }
           } catch (_) {}
 
-          // Rule: Show if COMPLETED OR (Time is over AND NOT CANCELLED)
-          return isCompleted || (isExpired && status != 'CANCELLED');
+          // Rule: Show only if doctor marked COMPLETED AND the time is over
+          return isCompleted && isExpired;
         },
         orElse: () => null,
       );
@@ -208,7 +199,7 @@ class HomeDashboardState extends State<HomeDashboard> {
                 onPressed: () async {
                   _dismissedReviewIds.add(appointmentId);
                   final prefs = await SharedPreferences.getInstance();
-                  await prefs.setString('review_dismissed_at_$appointmentId', DateTime.now().toIso8601String());
+                  await prefs.setBool('review_dismissed_$appointmentId', true);
                   if (mounted) Navigator.pop(context);
                 },
                 child: const Text('LATER', style: TextStyle(color: AppColors.silver500)),
@@ -225,7 +216,7 @@ class HomeDashboardState extends State<HomeDashboard> {
                     );
                     _dismissedReviewIds.add(appointmentId);
                     final prefs = await SharedPreferences.getInstance();
-                    await prefs.remove('review_dismissed_at_$appointmentId'); // Clear cooldown on success
+                    await prefs.remove('review_dismissed_$appointmentId'); // Clear dismissal on success
                     if (mounted) {
                       Navigator.pop(context);
                       AppToast.show(context, 'Success! Feedback shared.', isError: false);

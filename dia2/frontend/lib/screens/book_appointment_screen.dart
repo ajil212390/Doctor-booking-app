@@ -19,6 +19,7 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
   late Map<String, dynamic> _doctor;
   
   DateTime _selectedDate = DateTime.now();
+  DateTime _displayMonth = DateTime(DateTime.now().year, DateTime.now().month, 1);
   int? _selectedSlotId;
   Map<String, List<dynamic>> _groupedSlots = {};
   List<String> _availableDates = [];
@@ -315,6 +316,9 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
   }
 
   Widget _buildDateSelection() {
+    final now = DateTime.now();
+    final canGoPrev = DateTime(_displayMonth.year, _displayMonth.month).isAfter(DateTime(now.year, now.month));
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -331,9 +335,24 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
             ),
             Row(
               children: [
-                _buildCircleNavButton(Icons.chevron_left, () {}),
+                _buildCircleNavButton(
+                  Icons.chevron_left, 
+                  canGoPrev ? () {
+                    setState(() {
+                      _displayMonth = DateTime(_displayMonth.year, _displayMonth.month - 1, 1);
+                    });
+                  } : () {},
+                  enabled: canGoPrev,
+                ),
                 const SizedBox(width: 8),
-                _buildCircleNavButton(Icons.chevron_right, () {}),
+                _buildCircleNavButton(
+                  Icons.chevron_right, 
+                  () {
+                    setState(() {
+                      _displayMonth = DateTime(_displayMonth.year, _displayMonth.month + 1, 1);
+                    });
+                  },
+                ),
               ],
             ),
           ],
@@ -346,17 +365,34 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
             borderRadius: BorderRadius.circular(32),
             border: Border.all(color: Colors.white.withOpacity(0.1)),
           ),
-          child: _buildCalendarGrid(),
+          child: Column(
+            children: [
+              // Month/Year label
+              Padding(
+                padding: const EdgeInsets.only(bottom: 20),
+                child: Text(
+                  DateFormat('MMMM yyyy').format(_displayMonth),
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 16,
+                    color: Colors.white.withOpacity(0.7),
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+              ),
+              _buildCalendarGrid(),
+            ],
+          ),
         ),
       ],
     );
   }
 
   Widget _buildCalendarGrid() {
-    // Basic calendar implementation for the current month
-    final firstDayOfMonth = DateTime(_selectedDate.year, _selectedDate.month, 1);
-    final daysInMonth = DateTime(_selectedDate.year, _selectedDate.month + 1, 0).day;
+    final firstDayOfMonth = DateTime(_displayMonth.year, _displayMonth.month, 1);
+    final daysInMonth = DateTime(_displayMonth.year, _displayMonth.month + 1, 0).day;
     final firstWeekday = firstDayOfMonth.weekday; // 1 = Monday, 7 = Sunday
+    final today = DateTime.now();
     
     final weekdays = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];
     
@@ -384,13 +420,14 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
               return const SizedBox();
             }
             final day = index - (firstWeekday - 1) + 1;
-            final date = DateTime(_selectedDate.year, _selectedDate.month, day);
+            final date = DateTime(_displayMonth.year, _displayMonth.month, day);
             final dateKey = DateFormat('yyyy-MM-dd').format(date);
             final isAvailable = _availableDates.contains(dateKey);
             final isSelected = DateFormat('yyyy-MM-dd').format(_selectedDate) == dateKey;
+            final isPast = date.isBefore(DateTime(today.year, today.month, today.day));
             
             return GestureDetector(
-              onTap: isAvailable ? () {
+              onTap: (isAvailable && !isPast) ? () {
                 setState(() {
                   _selectedDate = date;
                   _selectedSlotId = null;
@@ -406,7 +443,11 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
                 child: Text(
                   '$day',
                   style: TextStyle(
-                    color: isAvailable ? Colors.white : Colors.white.withOpacity(0.1),
+                    color: isPast 
+                        ? Colors.white.withOpacity(0.05) 
+                        : isAvailable 
+                            ? Colors.white 
+                            : Colors.white.withOpacity(0.1),
                     fontSize: 16,
                     fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                   ),
@@ -548,18 +589,18 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
     );
   }
 
-  Widget _buildCircleNavButton(IconData icon, VoidCallback onTap) {
+  Widget _buildCircleNavButton(IconData icon, VoidCallback onTap, {bool enabled = true}) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
         width: 32,
         height: 32,
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.04),
+          color: Colors.white.withOpacity(enabled ? 0.04 : 0.02),
           shape: BoxShape.circle,
-          border: Border.all(color: Colors.white.withOpacity(0.1)),
+          border: Border.all(color: Colors.white.withOpacity(enabled ? 0.1 : 0.05)),
         ),
-        child: Icon(icon, size: 16, color: Colors.white),
+        child: Icon(icon, size: 16, color: enabled ? Colors.white : Colors.white.withOpacity(0.2)),
       ),
     );
   }

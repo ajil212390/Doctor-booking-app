@@ -327,6 +327,39 @@ class PredictionResultScreen extends StatelessWidget {
   Widget _buildActionButtons(BuildContext context, String riskLevel) {
     return Column(
       children: [
+        // Book a Consultation button
+        GestureDetector(
+          onTap: () {
+            Navigator.pushNamed(context, '/doctor-list');
+          },
+          child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(vertical: 18),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.08),
+              borderRadius: BorderRadius.circular(30),
+              border: Border.all(color: Colors.white.withOpacity(0.15)),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.calendar_month_rounded, color: Colors.white.withOpacity(0.9), size: 18),
+                const SizedBox(width: 10),
+                Text(
+                  'BOOK A CONSULTATION',
+                  style: GoogleFonts.plusJakartaSans(
+                    color: Colors.white.withOpacity(0.9),
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 1.5,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: 16),
+        // Return Home text button
         TextButton(
           onPressed: () {
             Navigator.of(context).pushNamedAndRemoveUntil(
